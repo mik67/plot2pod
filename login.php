@@ -57,7 +57,7 @@ $csrf = generateCsrfToken();
         <?php if ($error): ?>
             <div class="error-msg"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
-        <form method="POST" action="/login.php">
+        <form method="POST" action="/login.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
             <label>
                 Email

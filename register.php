@@ -73,7 +73,7 @@ $csrf = generateCsrfToken();
         <?php if ($error): ?>
             <div class="error-msg"><?= $error ?></div>
         <?php endif; ?>
-        <form method="POST" action="/register.php">
+        <form method="POST" action="/register.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
             <label>
                 Name

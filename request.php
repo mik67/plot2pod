@@ -112,30 +112,32 @@ $csrf = generateCsrfToken();
 
             <fieldset class="type-selector">
                 <legend>How would you like to submit?</legend>
-                <label class="type-option">
-                    <input type="radio" name="type" value="topic" checked>
-                    <span class="type-label">
-                        <span class="type-icon">📝</span>
-                        <strong>Give me a topic</strong>
-                        <small>Describe what you want to learn about</small>
-                    </span>
-                </label>
-                <label class="type-option">
-                    <input type="radio" name="type" value="links">
-                    <span class="type-label">
-                        <span class="type-icon">🔗</span>
-                        <strong>I have source links</strong>
-                        <small>Paste URLs to articles or resources</small>
-                    </span>
-                </label>
-                <label class="type-option">
-                    <input type="radio" name="type" value="files">
-                    <span class="type-label">
-                        <span class="type-icon">📁</span>
-                        <strong>Upload files</strong>
-                        <small>PDF, TXT, or DOCX — max 10 MB each</small>
-                    </span>
-                </label>
+                <div class="type-options">
+                    <label class="type-option">
+                        <input type="radio" name="type" value="topic" checked>
+                        <span class="type-label">
+                            <span class="type-icon">📝</span>
+                            <strong>Give me a topic</strong>
+                            <small>Describe what you want to learn about</small>
+                        </span>
+                    </label>
+                    <label class="type-option">
+                        <input type="radio" name="type" value="links">
+                        <span class="type-label">
+                            <span class="type-icon">🔗</span>
+                            <strong>I have source links</strong>
+                            <small>Paste URLs to articles or resources</small>
+                        </span>
+                    </label>
+                    <label class="type-option">
+                        <input type="radio" name="type" value="files">
+                        <span class="type-label">
+                            <span class="type-icon">📁</span>
+                            <strong>Upload files</strong>
+                            <small>PDF, TXT, or DOCX — max 10 MB each</small>
+                        </span>
+                    </label>
+                </div>
             </fieldset>
 
             <div class="field-topic">

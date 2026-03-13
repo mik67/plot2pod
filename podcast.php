@@ -40,10 +40,12 @@ if (!$podcast) {
         <p class="podcast-meta">Duration: <?= gmdate('G:i:s', $podcast['duration']) ?></p>
         <p class="podcast-description"><?= htmlspecialchars($podcast['description']) ?></p>
 
-        <audio controls preload="metadata" class="main-player">
-            <source src="<?= htmlspecialchars($podcast['mp3_path']) ?>" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
+        <div class="podcast-player-wrap">
+            <audio controls preload="metadata">
+                <source src="<?= htmlspecialchars($podcast['mp3_path']) ?>" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
 
         <div class="podcast-cta">
             <?php if (isLoggedIn()): ?>

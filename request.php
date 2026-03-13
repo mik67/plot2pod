@@ -66,7 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
         } else {
-            $content = trim($_POST['content'] ?? '');
+            $content = $type === 'topic'
+                ? trim($_POST['content_topic'] ?? '')
+                : trim($_POST['content_links'] ?? '');
             if (empty($content)) {
                 $label = $type === 'topic' ? 'topic' : 'source links';
                 $error = "Please fill in the $label field.";
@@ -143,18 +145,18 @@ $csrf = generateCsrfToken();
             <div class="field-topic">
                 <label>
                     What should the podcast be about?
-                    <textarea name="content" rows="5"
+                    <textarea name="content_topic" rows="5"
                         placeholder="e.g. The impact of artificial intelligence on healthcare and medical diagnosis"
-                    ><?= htmlspecialchars($_POST['content'] ?? '') ?></textarea>
+                    ><?= htmlspecialchars($_POST['content_topic'] ?? '') ?></textarea>
                 </label>
             </div>
 
             <div class="field-links" style="display:none">
                 <label>
                     Paste your source URLs (one per line):
-                    <textarea name="content" rows="5"
+                    <textarea name="content_links" rows="5"
                         placeholder="https://example.com/article&#10;https://example.com/research"
-                    ><?= htmlspecialchars($_POST['content'] ?? '') ?></textarea>
+                    ><?= htmlspecialchars($_POST['content_links'] ?? '') ?></textarea>
                 </label>
             </div>
 

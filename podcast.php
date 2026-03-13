@@ -34,6 +34,27 @@ if (!$podcast) {
     include __DIR__ . '/partials/meta.php';
     ?>
     <link rel="stylesheet" href="/css/style.css">
+    <script type="application/ld+json">
+    <?= json_encode([
+        '@context'        => 'https://schema.org',
+        '@type'           => 'PodcastEpisode',
+        'name'            => $podcast['title'],
+        'description'     => $podcast['description'],
+        'url'             => SITE_URL . '/podcast.php?id=' . $podcast['id'],
+        'associatedMedia' => [
+            '@type'      => 'MediaObject',
+            'contentUrl' => (str_starts_with($podcast['mp3_path'], 'http') ? '' : SITE_URL) . $podcast['mp3_path'],
+            'encodingFormat' => 'audio/mpeg',
+            'duration'   => 'PT' . gmdate('H\Hi\Ms\S', $podcast['duration']),
+        ],
+        'partOfSeries'    => [
+            '@type' => 'PodcastSeries',
+            'name'  => 'plot2pod',
+            'url'   => SITE_URL,
+        ],
+        'datePublished'   => date('Y-m-d', strtotime($podcast['created_at'])),
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
+    </script>
 </head>
 <body>
 <?php include __DIR__ . '/partials/header.php'; ?>

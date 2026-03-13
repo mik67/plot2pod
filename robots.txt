@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /admin.php
+Disallow: /dashboard.php
+Disallow: /request.php
+Disallow: /login.php
+Disallow: /register.php
+Disallow: /logout.php
+Disallow: /db/
+Disallow: /tests/
+Disallow: /uploads/
+
+Sitemap: https://plot2pod.com/sitemap.php

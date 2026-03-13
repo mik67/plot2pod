@@ -1,0 +1,27 @@
+# ── Security: block sensitive paths ─────────────────────────────
+<FilesMatch "\.(sql|md|log|env|gitignore)$">
+    Require all denied
+</FilesMatch>
+
+<DirectoryMatch "^(.*/)(db|tests|docs|\.git|\.claude)(/|$)">
+    Require all denied
+</DirectoryMatch>
+
+# ── PHP settings ─────────────────────────────────────────────────
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>
+
+# ── Compression ──────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css application/javascript
+</IfModule>
+
+# ── Browser caching for static assets ───────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css             "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType audio/mpeg           "access plus 1 year"
+</IfModule>

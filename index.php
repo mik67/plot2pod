@@ -12,8 +12,8 @@ $podcasts = $pdo->query(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Turn any topic into a debate-format podcast. Submit a topic, upload your materials, or share your sources.">
     <title>plot2pod – AI-generated podcasts on any topic</title>
+    <?php include __DIR__ . '/partials/meta.php'; ?>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="home">

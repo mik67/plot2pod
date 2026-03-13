@@ -26,8 +26,13 @@ if (!$podcast) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="<?= htmlspecialchars(mb_substr($podcast['description'], 0, 160)) ?>">
     <title><?= htmlspecialchars($podcast['title']) ?> – plot2pod</title>
+    <?php
+    $metaTitle     = $podcast['title'];
+    $metaDesc      = $podcast['description'];
+    $metaCanonical = SITE_URL . '/podcast.php?id=' . $podcast['id'];
+    include __DIR__ . '/partials/meta.php';
+    ?>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>

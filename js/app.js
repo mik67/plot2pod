@@ -21,6 +21,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checked) showTypeField(checked.value);
 
         typeRadios.forEach(r => r.addEventListener('change', () => showTypeField(r.value)));
+
+        // Disable hidden fields before submit so only active content is sent
+        const form = document.querySelector('.request-form');
+        if (form) {
+            form.addEventListener('submit', () => {
+                const activeType = document.querySelector('input[name="type"]:checked')?.value;
+                if (activeType === 'topic') {
+                    const ta = document.querySelector('.field-links textarea');
+                    if (ta) ta.disabled = true;
+                } else if (activeType === 'links') {
+                    const ta = document.querySelector('.field-topic textarea');
+                    if (ta) ta.disabled = true;
+                }
+            });
+        }
     }
 
 });

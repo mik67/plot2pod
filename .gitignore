@@ -1,0 +1,6 @@
+config.php
+uploads/
+vendor/
+*.log
+.DS_Store
+.env

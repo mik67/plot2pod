@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pluginy – Claude Code (plot2pod)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              900: '#0c4a6e',
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .nav-link.active { @apply text-sky-400 border-b-2 border-sky-400; }
+    .badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+    .badge-blue  { background: rgba(14,165,233,0.15); color: #38bdf8; border: 1px solid rgba(14,165,233,0.3); }
+    .badge-green { background: rgba(34,197,94,0.15);  color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+    .badge-amber { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+    .badge-rose  { background: rgba(244,63,94,0.15);  color: #fb7185; border: 1px solid rgba(244,63,94,0.3); }
+    .badge-violet{ background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
+    .badge-slate { background: rgba(100,116,139,0.15);color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
+    pre code { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; }
+    .plugin-section { display: none; }
+    .plugin-section.active { display: block; }
+    .tab-btn { transition: all 0.2s; }
+    .tab-btn.active { background: rgba(14,165,233,0.12); color: #38bdf8; border-color: #0ea5e9; }
+    .collapsible-body { display: none; }
+    .collapsible-body.open { display: block; }
+    .rotate-90 { transform: rotate(90deg); }
+  </style>
+</head>
+<body class="dark bg-gray-950 text-gray-100 min-h-screen font-sans">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-4 py-3">
+  <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2 min-w-0">
+      <span class="text-sky-400 text-xl font-bold shrink-0">⚡</span>
+      <div class="min-w-0">
+        <h1 class="text-sm font-bold text-white truncate">Claude Code Pluginy</h1>
+        <p class="text-xs text-gray-500 hidden sm:block">plot2pod · 7 aktivních pluginů</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="badge badge-green">v aktívní</span>
+      <span class="text-gray-600 text-xs hidden md:inline">2026-03-12</span>
+    </div>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="sticky top-[57px] z-40 bg-gray-900/90 backdrop-blur border-b border-gray-800 overflow-x-auto">
+  <div class="max-w-4xl mx-auto flex gap-0.5 px-3 py-2 min-w-max">
+    <button class="tab-btn active px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('overview')">Přehled</button>
+    <button class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('superpowers')">⚡ Superpowers</button>
+    <button class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('playwright')">🎭 Playwright</button>
+    <button class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('prreview')">🔍 PR Review</button>
+    <button class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('playground')">🛝 Playground</button>
+    <button class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('frontend')">🎨 Frontend</button>
+    <button class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('plugindev')">🔧 Plugin Dev</button>
+    <button class="tab-btn px-3 py-1.5 rounded-md text-sm font-medium border border-transparent text-gray-300" onclick="showTab('skillcreator')">🧪 Skill Creator</button>
+  </div>
+</nav>
+
+<main class="max-w-4xl mx-auto px-4 py-6 pb-20">
+
+<!-- ═══════════════════════════════════════════════════════════ OVERVIEW -->
+<section id="tab-overview" class="plugin-section active space-y-6">
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h2 class="text-lg font-bold text-white mb-1">Aktivní pluginy v projektu</h2>
+    <p class="text-sm text-gray-400 mb-4">Projektu <code class="text-sky-400 text-xs bg-gray-800 px-1.5 py-0.5 rounded">plot2pod</code> jsou přiřazeny 6 lokálních pluginů + 1 globální (frontend-design). Každý plugin rozšiřuje schopnosti Claude Code o nové funkce, dovednosti nebo nástroje.</p>
+
+    <div class="grid gap-3 sm:grid-cols-2">
+      <!-- Superpowers -->
+      <button onclick="showTab('superpowers')" class="text-left rounded-lg border border-gray-700 bg-gray-800/50 p-4 hover:border-sky-700 hover:bg-gray-800 transition-all group">
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-2xl">⚡</span>
+          <span class="badge badge-blue">v5.0.2</span>
+        </div>
+        <h3 class="font-bold text-white group-hover:text-sky-300 transition-colors">Superpowers</h3>
+        <p class="text-xs text-gray-400 mt-1">Kompletní workflow pro vývoj software. 14 skills pro plánování, TDD, debugging a review.</p>
+        <div class="mt-3 flex flex-wrap gap-1">
+          <span class="badge badge-violet">14 skills</span>
+          <span class="badge badge-slate">1 hook</span>
+        </div>
+      </button>
+
+      <!-- Playwright -->
+      <button onclick="showTab('playwright')" class="text-left rounded-lg border border-gray-700 bg-gray-800/50 p-4 hover:border-sky-700 hover:bg-gray-800 transition-all group">
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-2xl">🎭</span>
+          <span class="badge badge-green">MCP Server</span>
+        </div>
+        <h3 class="font-bold text-white group-hover:text-sky-300 transition-colors">Playwright</h3>
+        <p class="text-xs text-gray-400 mt-1">Browser automatizace od Microsoftu. Ovládání prohlížeče, screenshoty, formuláře, testování.</p>
+        <div class="mt-3 flex flex-wrap gap-1">
+          <span class="badge badge-amber">22 nástrojů</span>
+          <span class="badge badge-slate">Microsoft</span>
+        </div>
+      </button>
+
+      <!-- PR Review -->
+      <button onclick="showTab('prreview')" class="text-left rounded-lg border border-gray-700 bg-gray-800/50 p-4 hover:border-sky-700 hover:bg-gray-800 transition-all group">
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-2xl">🔍</span>
+          <span class="badge badge-rose">6 agentů</span>
+        </div>
+        <h3 class="font-bold text-white group-hover:text-sky-300 transition-colors">PR Review Toolkit</h3>
+        <p class="text-xs text-gray-400 mt-1">Sada specializovaných agentů pro hloubkovou revizi kódu – testy, typy, chyby, komentáře.</p>
+        <div class="mt-3 flex flex-wrap gap-1">
+          <span class="badge badge-rose">6 agentů</span>
+          <span class="badge badge-slate">1 příkaz</span>
+        </div>
+      </button>
+
+      <!-- Skill Creator -->
+      <button onclick="showTab('skillcreator')" class="text-left rounded-lg border border-gray-700 bg-gray-800/50 p-4 hover:border-sky-700 hover:bg-gray-800 transition-all group">
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-2xl">🧪</span>
+          <span class="badge badge-green">1 skill</span>
+        </div>
+        <h3 class="font-bold text-white group-hover:text-sky-300 transition-colors">Skill Creator</h3>
+        <p class="text-xs text-gray-400 mt-1">Tvorba a zlepšování skills. Eval loop, benchmark viewer, optimalizace description pro přesné spouštění.</p>
+        <div class="mt-3 flex flex-wrap gap-1">
+          <span class="badge badge-green">1 skill</span>
+          <span class="badge badge-rose">3 agenti</span>
+          <span class="badge badge-slate">7 skriptů</span>
+        </div>
+      </button>
+
+      <!-- Plugin Dev -->
+      <button onclick="showTab('plugindev')" class="text-left rounded-lg border border-gray-700 bg-gray-800/50 p-4 hover:border-sky-700 hover:bg-gray-800 transition-all group">
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-2xl">🔧</span>
+          <span class="badge badge-amber">7 skills</span>
+        </div>
+        <h3 class="font-bold text-white group-hover:text-sky-300 transition-colors">Plugin Dev Toolkit</h3>
+        <p class="text-xs text-gray-400 mt-1">Nástroje pro tvorbu vlastních pluginů. Hooks, MCP, agenti, příkazy, skills – celý lifecycle.</p>
+        <div class="mt-3 flex flex-wrap gap-1">
+          <span class="badge badge-amber">7 skills</span>
+          <span class="badge badge-rose">3 agenti</span>
+          <span class="badge badge-blue">1 příkaz</span>
+        </div>
+      </button>
+
+      <!-- Frontend Design -->
+      <button onclick="showTab('frontend')" class="text-left rounded-lg border border-gray-700 bg-gray-800/50 p-4 hover:border-sky-700 hover:bg-gray-800 transition-all group">
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-2xl">🎨</span>
+          <span class="badge badge-green">user-scope</span>
+        </div>
+        <h3 class="font-bold text-white group-hover:text-sky-300 transition-colors">Frontend Design</h3>
+        <p class="text-xs text-gray-400 mt-1">Generátor produkčních UI. Výrazné estetiky, typografie, animace – žádný generický AI vzhled.</p>
+        <div class="mt-3 flex flex-wrap gap-1">
+          <span class="badge badge-violet">1 skill</span>
+          <span class="badge badge-slate">Anthropic</span>
+        </div>
+      </button>
+
+      <!-- Playground -->
+      <button onclick="showTab('playground')" class="text-left rounded-lg border border-gray-700 bg-gray-800/50 p-4 hover:border-sky-700 hover:bg-gray-800 transition-all group">
+        <div class="flex items-start justify-between mb-2">
+          <span class="text-2xl">🛝</span>
+          <span class="badge badge-violet">1 skill</span>
+        </div>
+        <h3 class="font-bold text-white group-hover:text-sky-300 transition-colors">Playground</h3>
+        <p class="text-xs text-gray-400 mt-1">Generátor interaktivních HTML explorerů. Vizuální ovládací prvky + živý náhled + prompt output.</p>
+        <div class="mt-3 flex flex-wrap gap-1">
+          <span class="badge badge-violet">6 šablon</span>
+          <span class="badge badge-slate">single-file HTML</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Quick commands -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h2 class="text-base font-bold text-white mb-3">Rychlý přehled příkazů</h2>
+    <div class="space-y-2 text-sm">
+      <div class="flex items-start gap-3 p-3 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 font-mono text-xs shrink-0">/plugin</code>
+        <span class="text-gray-400">Otevře marketplace pro instalaci / správu pluginů</span>
+      </div>
+      <div class="flex items-start gap-3 p-3 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 font-mono text-xs shrink-0">/reload-plugins</code>
+        <span class="text-gray-400">Znovu načte pluginy po instalaci nebo aktualizaci</span>
+      </div>
+      <div class="flex items-start gap-3 p-3 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 font-mono text-xs shrink-0">/review-pr</code>
+        <span class="text-gray-400">Spustí komplexní PR review přes PR Review Toolkit</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Workflow vizualizace -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h2 class="text-base font-bold text-white mb-3">Doporučený vývojový workflow</h2>
+    <ol class="space-y-2">
+      <li class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/40">
+        <span class="w-6 h-6 rounded-full bg-sky-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">1</span>
+        <div><span class="text-white text-sm font-medium">Brainstorming</span><span class="text-gray-500 text-xs ml-2">⚡ Superpowers</span></div>
+      </li>
+      <li class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/40">
+        <span class="w-6 h-6 rounded-full bg-sky-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">2</span>
+        <div><span class="text-white text-sm font-medium">Git Worktree → Plán</span><span class="text-gray-500 text-xs ml-2">⚡ Superpowers</span></div>
+      </li>
+      <li class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/40">
+        <span class="w-6 h-6 rounded-full bg-sky-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">3</span>
+        <div><span class="text-white text-sm font-medium">TDD Implementace</span><span class="text-gray-500 text-xs ml-2">⚡ Superpowers</span></div>
+      </li>
+      <li class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/40">
+        <span class="w-6 h-6 rounded-full bg-sky-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">4</span>
+        <div><span class="text-white text-sm font-medium">Code Review + Silent Failures</span><span class="text-gray-500 text-xs ml-2">🔍 PR Review Toolkit</span></div>
+      </li>
+      <li class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/40">
+        <span class="w-6 h-6 rounded-full bg-sky-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">5</span>
+        <div><span class="text-white text-sm font-medium">E2E testy v prohlížeči</span><span class="text-gray-500 text-xs ml-2">🎭 Playwright</span></div>
+      </li>
+      <li class="flex items-center gap-3 p-3 rounded-lg bg-gray-800/40">
+        <span class="w-6 h-6 rounded-full bg-sky-900 text-sky-300 text-xs font-bold flex items-center justify-center shrink-0">6</span>
+        <div><span class="text-white text-sm font-medium">Merge / PR</span><span class="text-gray-500 text-xs ml-2">⚡ Superpowers</span></div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ SUPERPOWERS -->
+<section id="tab-superpowers" class="plugin-section space-y-5">
+  <div class="rounded-xl border border-sky-900/50 bg-gray-900 p-5">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-2xl">⚡</span>
+          <h2 class="text-lg font-bold text-white">Superpowers</h2>
+        </div>
+        <p class="text-sm text-gray-400">Kompletní vývojový workflow – od prvního nápadu po merge. Plugin automaticky spouští relevantní skills v každé fázi vývoje.</p>
+      </div>
+      <span class="badge badge-blue shrink-0">v5.0.2</span>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <span class="badge badge-violet">14 skills</span>
+      <span class="badge badge-slate">Jesse Vincent</span>
+      <span class="badge badge-green">MIT</span>
+    </div>
+  </div>
+
+  <!-- Filozofie -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Filozofie</h3>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <div class="p-3 rounded-lg bg-gray-800/50 text-sm">
+        <div class="text-sky-400 font-bold mb-1">Test-First</div>
+        <div class="text-gray-400">Vždy píšeme testy dříve než kód. RED → GREEN → REFACTOR.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 text-sm">
+        <div class="text-sky-400 font-bold mb-1">YAGNI</div>
+        <div class="text-gray-400">Neimplementujeme to, co teď nepotřebujeme.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 text-sm">
+        <div class="text-sky-400 font-bold mb-1">DRY</div>
+        <div class="text-gray-400">Don't Repeat Yourself – bez duplicit v kódu.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 text-sm">
+        <div class="text-sky-400 font-bold mb-1">Evidence first</div>
+        <div class="text-gray-400">Tvrzení bez ověření nestačí. Vždy spusť, ověř, pak oznam.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skills seznam -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-4">Skills (14)</h3>
+    <div class="space-y-2">
+
+      <!-- brainstorming -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">💡</span>
+            <div>
+              <span class="font-medium text-white text-sm">brainstorming</span>
+              <span class="badge badge-amber ml-2">povinný před kódem</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Aktivuje se automaticky před jakoukoliv tvůrčí prací. Pomocí sokratovských otázek upřesní zadání, prozkoumá alternativy a prezentuje design po částech k validaci. Výsledek uloží do dokumentu.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: "chci postavit funkci X" / "potřebuji přidat Y" / jakýkoliv vývoj nové funkce
+          </div>
+        </div>
+      </div>
+
+      <!-- using-git-worktrees -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🌿</span>
+            <div>
+              <span class="font-medium text-white text-sm">using-git-worktrees</span>
+              <span class="badge badge-blue ml-2">izolace</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Po schválení designu vytvoří izolovaný git worktree na nové větvi. Spustí project setup, ověří čisté testovací prostředí. Umožňuje paralelní vývoj bez konfliktu s hlavní větví.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: začátek implementace nové funkce, příprava izolovaného prostředí
+          </div>
+        </div>
+      </div>
+
+      <!-- writing-plans -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">📋</span>
+            <div>
+              <span class="font-medium text-white text-sm">writing-plans</span>
+              <span class="badge badge-blue ml-2">plánování</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Rozkládá schválený design na drobné úkoly (2–5 min každý). Každý úkol obsahuje přesné cesty k souborům, kompletní kód a kroky ověření. Plán je srozumitelný i juniornímu vývojáři.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: "napiš plán implementace" / po schválení brainstormingu
+          </div>
+        </div>
+      </div>
+
+      <!-- subagent-driven-development -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🤖</span>
+            <div>
+              <span class="font-medium text-white text-sm">subagent-driven-development</span>
+              <span class="badge badge-violet ml-2">paralelní agenti</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Spouští samostatného subagenta pro každý úkol z plánu. Dvoustupňová revize: nejprve shoda se specifikací, pak kvalita kódu. Umožňuje autonomní práci Claude po hodiny bez odchylky od plánu.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: "proveď plán" / "implementuj úkoly" / po vytvoření plánu
+          </div>
+        </div>
+      </div>
+
+      <!-- executing-plans -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">▶️</span>
+            <div>
+              <span class="font-medium text-white text-sm">executing-plans</span>
+              <span class="badge badge-slate ml-2">dávkové</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Alternativa k subagent-driven-development. Spouští plán v dávkách s kontrolními body pro lidský vstup. Vhodné, když chceš průběžně kontrolovat postup.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: "spusť plán s kontrolami" / preferuješ checkpointy
+          </div>
+        </div>
+      </div>
+
+      <!-- test-driven-development -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🧪</span>
+            <div>
+              <span class="font-medium text-white text-sm">test-driven-development</span>
+              <span class="badge badge-amber ml-2">povinný</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Vynucuje RED-GREEN-REFACTOR cyklus. Nejprve napíše failing test, sleduje selhání, pak napíše minimální kód pro passing test, commituje. Kód napsaný před testem se smaže.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-red-400">
+            🔴 RED → 🟢 GREEN → 🔵 REFACTOR
+          </div>
+        </div>
+      </div>
+
+      <!-- systematic-debugging -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🐛</span>
+            <div>
+              <span class="font-medium text-white text-sm">systematic-debugging</span>
+              <span class="badge badge-rose ml-2">debugging</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>4-fázový proces hledání příčiny chyby. Spustí se při jakémkoliv bugu nebo neočekávaném chování. Nezačíná opravou, ale nejprve pochopí co a proč se děje.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: test selhal / bug / neočekávané chování
+          </div>
+        </div>
+      </div>
+
+      <!-- verification-before-completion -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">✅</span>
+            <div>
+              <span class="font-medium text-white text-sm">verification-before-completion</span>
+              <span class="badge badge-amber ml-2">evidence</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Před oznámením "hotovo" vyžaduje spuštění verifikačních příkazů a potvrzení výstupu. Zabraňuje falešným prohlášením o dokončení. Evidence before assertions.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: před jakýmkoliv tvrzením "je to opraveno" / "testy procházejí"
+          </div>
+        </div>
+      </div>
+
+      <!-- requesting-code-review -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">👀</span>
+            <div>
+              <span class="font-medium text-white text-sm">requesting-code-review</span>
+              <span class="badge badge-blue ml-2">review</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Pre-review checklist před mergeováním. Kontroluje soulad s plánem a hlásí problémy podle závažnosti. Kritické problémy blokují postup.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: dokončení úkolu, před mergeováním
+          </div>
+        </div>
+      </div>
+
+      <!-- receiving-code-review -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">📨</span>
+            <div>
+              <span class="font-medium text-white text-sm">receiving-code-review</span>
+              <span class="badge badge-blue ml-2">review</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Správná reakce na code review feedback. Vyžaduje technickou přísnost a ověření, nikoli jen slepé přijímání návrhů. Kontroluje technickou validitu feedbacku.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: přijímání code review komentářů, před implementací návrhů
+          </div>
+        </div>
+      </div>
+
+      <!-- dispatching-parallel-agents -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">⚡</span>
+            <div>
+              <span class="font-medium text-white text-sm">dispatching-parallel-agents</span>
+              <span class="badge badge-violet ml-2">paralelizace</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Paralelní spuštění 2+ nezávislých úkolů bez sdíleného stavu. Výrazně zkracuje čas implementace u úkolů bez sekvenčních závislostí.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: 2+ nezávislé úkoly, které lze zpracovat souběžně
+          </div>
+        </div>
+      </div>
+
+      <!-- finishing-a-development-branch -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🏁</span>
+            <div>
+              <span class="font-medium text-white text-sm">finishing-a-development-branch</span>
+              <span class="badge badge-green ml-2">finalizace</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Po dokončení všech úkolů ověří testy, nabídne volby (merge/PR/zachovat/zahodit) a uklidí worktree. Strukturovaný závěr vývojové větve.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: implementace dokončena, testy procházejí, čas integrovat
+          </div>
+        </div>
+      </div>
+
+      <!-- brainstorming (using-superpowers) -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">📖</span>
+            <div>
+              <span class="font-medium text-white text-sm">using-superpowers</span>
+              <span class="badge badge-slate ml-2">meta</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Úvodní skill, který se spouští na začátku každé konverzace. Zajišťuje, že Claude ví o dostupných skills a jak je správně používat.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: automaticky na začátku konverzace
+          </div>
+        </div>
+      </div>
+
+      <!-- writing-skills -->
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">✍️</span>
+            <div>
+              <span class="font-medium text-white text-sm">writing-skills</span>
+              <span class="badge badge-slate ml-2">meta</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Vytváření nových skills, editace existujících, ověření před nasazením. Obsahuje testovací metodologii pro skills.</p>
+          <div class="bg-gray-800 rounded p-3 font-mono text-xs text-sky-300">
+            Trigger: "vytvořit nový skill" / "upravit skill"
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ PLAYWRIGHT -->
+<section id="tab-playwright" class="plugin-section space-y-5">
+  <div class="rounded-xl border border-green-900/50 bg-gray-900 p-5">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-2xl">🎭</span>
+          <h2 class="text-lg font-bold text-white">Playwright</h2>
+        </div>
+        <p class="text-sm text-gray-400">MCP server od Microsoftu. Dává Claude Code plnou kontrolu nad prohlížečem – navigace, klikání, formuláře, screenshoty, síťové požadavky a automatizované testování.</p>
+      </div>
+      <span class="badge badge-green shrink-0">MCP</span>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-3">
+      <span class="badge badge-amber">22 nástrojů</span>
+      <span class="badge badge-slate">Microsoft</span>
+      <span class="badge badge-green">@playwright/mcp</span>
+    </div>
+  </div>
+
+  <!-- Jak funguje -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Jak to funguje</h3>
+    <p class="text-sm text-gray-400 mb-3">Plugin registruje MCP (Model Context Protocol) server, který spouští <code class="text-sky-300 text-xs bg-gray-800 px-1 rounded">npx @playwright/mcp@latest</code>. Claude pak může volat nástroje tohoto serveru přímo v konverzaci.</p>
+    <div class="bg-gray-800/50 rounded-lg p-3 font-mono text-xs text-gray-300">
+      <div class="text-gray-500 mb-1"># Konfigurace .mcp.json</div>
+      <div>{"playwright": {"command": "npx", "args": ["@playwright/mcp@latest"]}}</div>
+    </div>
+  </div>
+
+  <!-- Nástroje -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-4">Dostupné nástroje (22)</h3>
+
+    <div class="mb-4">
+      <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Navigace a stránky</h4>
+      <div class="grid gap-2 sm:grid-cols-2">
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_navigate</code>
+          <p class="text-xs text-gray-400 mt-1">Přechod na URL adresu</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_navigate_back</code>
+          <p class="text-xs text-gray-400 mt-1">Zpět v historii prohlížeče</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_tabs</code>
+          <p class="text-xs text-gray-400 mt-1">Správa záložek prohlížeče</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_close</code>
+          <p class="text-xs text-gray-400 mt-1">Zavření prohlížeče / záložky</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_resize</code>
+          <p class="text-xs text-gray-400 mt-1">Změna rozlišení okna</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_install</code>
+          <p class="text-xs text-gray-400 mt-1">Instalace browseru</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Interakce s prvky</h4>
+      <div class="grid gap-2 sm:grid-cols-2">
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_click</code>
+          <p class="text-xs text-gray-400 mt-1">Kliknutí na element na stránce</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_hover</code>
+          <p class="text-xs text-gray-400 mt-1">Přejetí myší přes element</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_drag</code>
+          <p class="text-xs text-gray-400 mt-1">Přetažení elementu (drag & drop)</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_press_key</code>
+          <p class="text-xs text-gray-400 mt-1">Stisk klávesy (Enter, Tab, Esc…)</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_type</code>
+          <p class="text-xs text-gray-400 mt-1">Zadání textu do aktivního elementu</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_fill_form</code>
+          <p class="text-xs text-gray-400 mt-1">Vyplnění formuláře najednou</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_select_option</code>
+          <p class="text-xs text-gray-400 mt-1">Výběr možnosti v &lt;select&gt;</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_file_upload</code>
+          <p class="text-xs text-gray-400 mt-1">Nahrání souboru přes input[file]</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_handle_dialog</code>
+          <p class="text-xs text-gray-400 mt-1">Zpracování alert/confirm/prompt dialogů</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Inspekce a debugování</h4>
+      <div class="grid gap-2 sm:grid-cols-2">
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_take_screenshot</code>
+          <p class="text-xs text-gray-400 mt-1">Screenshot aktuální stránky</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_snapshot</code>
+          <p class="text-xs text-gray-400 mt-1">Zachycení stavu DOM (accessibility tree)</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_console_messages</code>
+          <p class="text-xs text-gray-400 mt-1">Čtení zpráv z konzole prohlížeče</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_network_requests</code>
+          <p class="text-xs text-gray-400 mt-1">Seznam síťových požadavků</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_evaluate</code>
+          <p class="text-xs text-gray-400 mt-1">Spuštění JS v kontextu stránky</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_run_code</code>
+          <p class="text-xs text-gray-400 mt-1">Spuštění kódu v prohlížeči</p>
+        </div>
+        <div class="p-3 rounded-lg bg-gray-800/50">
+          <code class="text-sky-300 text-xs font-mono">browser_wait_for</code>
+          <p class="text-xs text-gray-400 mt-1">Čekání na element / podmínku</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Příklady použití -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Jak ovládat</h3>
+    <p class="text-sm text-gray-400 mb-3">Stačí přirozeně popsat, co chcete provést v prohlížeči. Claude automaticky použije správné nástroje.</p>
+    <div class="space-y-2 text-sm">
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Otevři localhost:3000 a pořiď screenshot"</div>
+        <div class="text-gray-500 text-xs">→ <code class="text-sky-300">browser_navigate</code> + <code class="text-sky-300">browser_take_screenshot</code></div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Vyplň přihlašovací formulář a klikni na Login"</div>
+        <div class="text-gray-500 text-xs">→ <code class="text-sky-300">browser_fill_form</code> + <code class="text-sky-300">browser_click</code></div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Zkontroluj, jestli nejsou chyby v konzoli"</div>
+        <div class="text-gray-500 text-xs">→ <code class="text-sky-300">browser_console_messages</code></div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Otestuj responzivitu na mobilním rozlišení"</div>
+        <div class="text-gray-500 text-xs">→ <code class="text-sky-300">browser_resize</code> + <code class="text-sky-300">browser_take_screenshot</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ PR REVIEW -->
+<section id="tab-prreview" class="plugin-section space-y-5">
+  <div class="rounded-xl border border-rose-900/50 bg-gray-900 p-5">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-2xl">🔍</span>
+          <h2 class="text-lg font-bold text-white">PR Review Toolkit</h2>
+        </div>
+        <p class="text-sm text-gray-400">6 specializovaných agentů pro komplexní revizi kódu. Každý se zaměřuje na jinou oblast kvality. Spouštějí se automaticky nebo na vyžádání.</p>
+      </div>
+      <span class="badge badge-rose shrink-0">6 agentů</span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-rose">6 agentů</span>
+      <span class="badge badge-slate">Daisy / Anthropic</span>
+      <span class="badge badge-green">MIT</span>
+    </div>
+  </div>
+
+  <!-- Jak se spouštějí -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Spouštění agentů</h3>
+    <div class="space-y-3 text-sm">
+      <div>
+        <div class="text-xs text-gray-500 mb-1 font-bold uppercase tracking-wider">Automaticky (proaktivně)</div>
+        <div class="space-y-1.5">
+          <div class="flex items-start gap-2 p-2 rounded bg-gray-800/50">
+            <span class="text-green-400 shrink-0">→</span>
+            <span class="text-gray-300">Po napsání kódu: <code class="text-sky-300 text-xs">code-reviewer</code></span>
+          </div>
+          <div class="flex items-start gap-2 p-2 rounded bg-gray-800/50">
+            <span class="text-green-400 shrink-0">→</span>
+            <span class="text-gray-300">Po přidání dokumentace: <code class="text-sky-300 text-xs">comment-analyzer</code></span>
+          </div>
+          <div class="flex items-start gap-2 p-2 rounded bg-gray-800/50">
+            <span class="text-green-400 shrink-0">→</span>
+            <span class="text-gray-300">Po přidání typů: <code class="text-sky-300 text-xs">type-design-analyzer</code></span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="text-xs text-gray-500 mb-1 font-bold uppercase tracking-wider">Příkazem /review-pr</div>
+        <div class="bg-gray-800/50 rounded p-3 font-mono text-xs text-sky-300">/review-pr</div>
+        <div class="text-gray-400 text-xs mt-1">Spustí kompletní review přes všechny relevantní agenty.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agenti -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-4">Agenti (6)</h3>
+    <div class="space-y-3">
+
+      <!-- code-reviewer -->
+      <div class="p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">📋</span>
+            <h4 class="font-bold text-white">code-reviewer</h4>
+          </div>
+          <span class="badge badge-rose text-xs">skóre 0–100</span>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">Obecná revize kódu. Kontroluje shodu s CLAUDE.md, stylové porušení, detekci bugů a celkovou kvalitu. Problémy 91–100 jsou kritické.</p>
+        <div class="bg-gray-900/50 rounded p-3 text-xs space-y-1">
+          <div class="text-gray-500 font-bold">Aktivační fráze:</div>
+          <div class="text-green-300">"Zkontroluj moje změny" / "Review kód před commitem"</div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Kdy: po napsání / úpravě kódu, před commitem, před PR</div>
+      </div>
+
+      <!-- comment-analyzer -->
+      <div class="p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">💬</span>
+            <h4 class="font-bold text-white">comment-analyzer</h4>
+          </div>
+          <span class="badge badge-blue text-xs">přesnost</span>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">Analyzuje komentáře vs. skutečný kód. Hledá nepřesné, zastaralé nebo zavádějící komentáře. Prevence comment rot a technického dluhu.</p>
+        <div class="bg-gray-900/50 rounded p-3 text-xs space-y-1">
+          <div class="text-gray-500 font-bold">Aktivační fráze:</div>
+          <div class="text-green-300">"Jsou komentáře přesné?" / "Zkontroluj dokumentaci"</div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Kdy: po přidání docs, před finalizací PR s komentáři</div>
+      </div>
+
+      <!-- pr-test-analyzer -->
+      <div class="p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🧪</span>
+            <h4 class="font-bold text-white">pr-test-analyzer</h4>
+          </div>
+          <span class="badge badge-amber text-xs">gaps 1–10</span>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">Kontrola pokrytí testy. Hodnotí behavioral vs. line coverage, kritické mezery (10 = kritické), edge cases a chybové podmínky.</p>
+        <div class="bg-gray-900/50 rounded p-3 text-xs space-y-1">
+          <div class="text-gray-500 font-bold">Aktivační fráze:</div>
+          <div class="text-green-300">"Jsou testy dostatečné?" / "Pokrývají testy všechny edge cases?"</div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Kdy: po vytvoření PR, po přidání nové funkcionality</div>
+      </div>
+
+      <!-- silent-failure-hunter -->
+      <div class="p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🔇</span>
+            <h4 class="font-bold text-white">silent-failure-hunter</h4>
+          </div>
+          <span class="badge badge-rose text-xs">závažnost</span>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">Lovec tichých selhání. Hledá problémy v catch blocích, nedostatečné error handling, nevhodné fallback chování a chybějící error logging.</p>
+        <div class="bg-gray-900/50 rounded p-3 text-xs space-y-1">
+          <div class="text-gray-500 font-bold">Aktivační fráze:</div>
+          <div class="text-green-300">"Zkontroluj error handling" / "Hledej tiché chyby"</div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Kdy: po implementaci error handling, before PR s catch bloky</div>
+      </div>
+
+      <!-- type-design-analyzer -->
+      <div class="p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🏗️</span>
+            <h4 class="font-bold text-white">type-design-analyzer</h4>
+          </div>
+          <span class="badge badge-violet text-xs">4 dimenze 1–10</span>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">Expert na design typů. Hodnotí enkapsulaci, vyjádření invariantů, užitečnost a vynucení invariantů – každé na škále 1–10.</p>
+        <div class="bg-gray-900/50 rounded p-3 text-xs space-y-1">
+          <div class="text-gray-500 font-bold">Aktivační fráze:</div>
+          <div class="text-green-300">"Zkontroluj design typu UserAccount" / "Má tento typ silné invarianty?"</div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Kdy: při přidání nového typu, refactoringu datových modelů</div>
+      </div>
+
+      <!-- code-simplifier -->
+      <div class="p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">✨</span>
+            <h4 class="font-bold text-white">code-simplifier</h4>
+          </div>
+          <span class="badge badge-green text-xs">zachovává funkci</span>
+        </div>
+        <p class="text-sm text-gray-400 mb-3">Zjednodušuje kód bez změny funkcionality. Zaměřuje se na čitelnost, zbytečnou komplexnost, redundantní kód a konzistenci se standardy projektu.</p>
+        <div class="bg-gray-900/50 rounded p-3 text-xs space-y-1">
+          <div class="text-gray-500 font-bold">Aktivační fráze:</div>
+          <div class="text-green-300">"Zjednoduš tento kód" / "Udělej to čitelnější"</div>
+        </div>
+        <div class="mt-2 text-xs text-gray-500">Kdy: po code review, když kód funguje ale je komplexní</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Workflow -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Doporučený review workflow</h3>
+    <div class="space-y-1.5 text-sm">
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50">
+        <span class="badge badge-slate text-xs shrink-0">1</span>
+        <span class="text-gray-300">Napiš kód</span>
+        <span class="ml-auto text-xs text-gray-500">→ code-reviewer</span>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50">
+        <span class="badge badge-slate text-xs shrink-0">2</span>
+        <span class="text-gray-300">Oprav problémy + error handling</span>
+        <span class="ml-auto text-xs text-gray-500">→ silent-failure-hunter</span>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50">
+        <span class="badge badge-slate text-xs shrink-0">3</span>
+        <span class="text-gray-300">Přidej testy</span>
+        <span class="ml-auto text-xs text-gray-500">→ pr-test-analyzer</span>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50">
+        <span class="badge badge-slate text-xs shrink-0">4</span>
+        <span class="text-gray-300">Dokumentuj</span>
+        <span class="ml-auto text-xs text-gray-500">→ comment-analyzer</span>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50">
+        <span class="badge badge-slate text-xs shrink-0">5</span>
+        <span class="text-gray-300">Review projde → polish</span>
+        <span class="ml-auto text-xs text-gray-500">→ code-simplifier</span>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50">
+        <span class="badge badge-slate text-xs shrink-0">6</span>
+        <span class="text-gray-300">Vytvoř PR</span>
+        <span class="ml-auto text-xs text-gray-500">→ hotovo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════ PLAYGROUND -->
+<section id="tab-playground" class="plugin-section space-y-5">
+  <div class="rounded-xl border border-violet-900/50 bg-gray-900 p-5">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-2xl">🛝</span>
+          <h2 class="text-lg font-bold text-white">Playground</h2>
+        </div>
+        <p class="text-sm text-gray-400">Generátor interaktivních HTML explorerů. Vytváří self-contained single-file nástroje s živým náhledem, ovládacími prvky a copy-ready prompt výstupem.</p>
+      </div>
+      <span class="badge badge-violet shrink-0">1 skill</span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-violet">6 šablon</span>
+      <span class="badge badge-slate">single HTML file</span>
+      <span class="badge badge-green">dark theme</span>
+    </div>
+  </div>
+
+  <!-- Anatomie playgroundu -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Anatomie playgroundu</h3>
+    <div class="grid gap-3 sm:grid-cols-3">
+      <div class="p-3 rounded-lg bg-gray-800/50 text-center">
+        <div class="text-2xl mb-2">🎛️</div>
+        <div class="font-bold text-white text-sm">Ovládací prvky</div>
+        <div class="text-xs text-gray-400 mt-1">Slidery, checkboxy, selecty. Každá změna okamžitě aktualizuje náhled.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 text-center">
+        <div class="text-2xl mb-2">👁️</div>
+        <div class="font-bold text-white text-sm">Živý náhled</div>
+        <div class="text-xs text-gray-400 mt-1">Vizuální výsledek bez tlačítka Apply. Aktualizuje se real-time.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 text-center">
+        <div class="text-2xl mb-2">📋</div>
+        <div class="font-bold text-white text-sm">Prompt output</div>
+        <div class="text-xs text-gray-400 mt-1">Přirozený jazyk popisující volby. Copy button pro přímé použití v Claude.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Šablony -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-4">Šablony (6)</h3>
+    <div class="space-y-2">
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🎨</span>
+        <div>
+          <div class="font-medium text-white text-sm">design-playground</div>
+          <div class="text-xs text-gray-400">Vizuální designová rozhodnutí – komponenty, layouty, spacing, barvy, typografie</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🔢</span>
+        <div>
+          <div class="font-medium text-white text-sm">data-explorer</div>
+          <div class="text-xs text-gray-400">Data a query building – SQL, APIs, pipelines, regex</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🗺️</span>
+        <div>
+          <div class="font-medium text-white text-sm">concept-map</div>
+          <div class="text-xs text-gray-400">Učení a explorace – concept mapy, knowledge gaps, scope mapping</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">📄</span>
+        <div>
+          <div class="font-medium text-white text-sm">document-critique</div>
+          <div class="text-xs text-gray-400">Revize dokumentů – návrhy s approve/reject/comment workflow</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🔀</span>
+        <div>
+          <div class="font-medium text-white text-sm">diff-review</div>
+          <div class="text-xs text-gray-400">Code review – git diffy, commity, PR s line-by-line komentáři</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🏛️</span>
+        <div>
+          <div class="font-medium text-white text-sm">code-map</div>
+          <div class="text-xs text-gray-400">Architektura codebase – vztahy komponent, datový tok, vrstvové diagramy</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jak ovládat -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Jak ovládat</h3>
+    <div class="space-y-2 text-sm">
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Vytvoř playground pro výběr barvy tlačítka"</div>
+        <div class="text-gray-500 text-xs">→ spustí skill <code class="text-sky-300">playground</code> se šablonou design-playground</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Udělej interaktivní explorer pro SQL dotazy"</div>
+        <div class="text-gray-500 text-xs">→ spustí skill <code class="text-sky-300">playground</code> se šablonou data-explorer</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Chci vizuální nástroj pro review kódu"</div>
+        <div class="text-gray-500 text-xs">→ spustí skill <code class="text-sky-300">playground</code> se šablonou diff-review</div>
+      </div>
+    </div>
+    <div class="mt-4 p-3 rounded-lg bg-sky-900/20 border border-sky-800/30 text-xs text-sky-300">
+      💡 Po vygenerování Claude automaticky otevře soubor v prohlížeči pomocí <code>open &lt;file&gt;.html</code>
+    </div>
+  </div>
+
+  <!-- Technické požadavky -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Technické požadavky playgroundu</h3>
+    <ul class="space-y-2 text-sm text-gray-400">
+      <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5 shrink-0">✓</span> Jeden HTML soubor – vše inline (CSS + JS), žádné externí závislosti</li>
+      <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5 shrink-0">✓</span> Živý náhled – aktualizace při každé změně ovládacích prvků</li>
+      <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5 shrink-0">✓</span> Prompt output v přirozeném jazyce (ne jen hodnoty)</li>
+      <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5 shrink-0">✓</span> Tlačítko Copy s feedback "Copied!"</li>
+      <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5 shrink-0">✓</span> Výchozí hodnoty + 3–5 pojmenovaných presetů</li>
+      <li class="flex items-start gap-2"><span class="text-green-400 mt-0.5 shrink-0">✓</span> Dark theme, systémový font pro UI, monospace pro kód</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SKILL CREATOR -->
+<section id="tab-skillcreator" class="plugin-section space-y-5">
+  <div class="rounded-xl border border-emerald-900/50 bg-gray-900 p-5">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-2xl">🧪</span>
+          <h2 class="text-lg font-bold text-white">Skill Creator</h2>
+        </div>
+        <p class="text-sm text-gray-400">Plugin pro tvorbu nových skills a iterativní vylepšování existujících. Obsahuje kompletní eval loop: draft → test → review → improve → opakuj. Optimalizuje trigger description pro přesné spouštění.</p>
+      </div>
+      <span class="badge badge-green shrink-0">1 skill</span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-green">1 skill</span>
+      <span class="badge badge-rose">3 agenti</span>
+      <span class="badge badge-slate">7 Python skriptů</span>
+      <span class="badge badge-slate">Anthropic</span>
+    </div>
+  </div>
+
+  <!-- Core loop -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Základní workflow</h3>
+    <p class="text-sm text-gray-400 mb-4">Skill creator zjistí, kde se v procesu nacházíš, a pomůže ti pokročit dál. Ať jdeš od nuly nebo máš hotový draft, přizpůsobí se.</p>
+    <div class="space-y-1.5">
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">1</span>
+        <div><span class="text-white font-medium">Capture Intent</span> <span class="text-gray-500 text-xs ml-1">– co skill dělá, kdy se spouští, formát výstupu</span></div>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">2</span>
+        <div><span class="text-white font-medium">Interview &amp; Research</span> <span class="text-gray-500 text-xs ml-1">– edge cases, formáty, success criteria</span></div>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">3</span>
+        <div><span class="text-white font-medium">Napsat SKILL.md</span> <span class="text-gray-500 text-xs ml-1">– name, description, instrukce</span></div>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">4</span>
+        <div><span class="text-white font-medium">Spustit test cases</span> <span class="text-gray-500 text-xs ml-1">– with-skill + baseline paralelně</span></div>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">5</span>
+        <div><span class="text-white font-medium">Eval viewer</span> <span class="text-gray-500 text-xs ml-1">– HTML prohlížeč výsledků s feedback formulářem</span></div>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">6</span>
+        <div><span class="text-white font-medium">Vylepšit skill</span> <span class="text-gray-500 text-xs ml-1">– na základě feedbacku, opakuj</span></div>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">7</span>
+        <div><span class="text-white font-medium">Optimalizovat description</span> <span class="text-gray-500 text-xs ml-1">– automatický loop pro přesné spouštění</span></div>
+      </div>
+      <div class="flex items-center gap-3 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-6 h-6 rounded-full bg-emerald-900/60 text-emerald-300 text-xs font-bold flex items-center justify-center shrink-0">8</span>
+        <div><span class="text-white font-medium">Zabalit a distribuovat</span> <span class="text-gray-500 text-xs ml-1">– vygeneruje <code class="text-sky-300">.skill</code> soubor</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Eval systém -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Eval systém</h3>
+    <p class="text-sm text-gray-400 mb-4">Pro každý test case se spouštějí dva subagenti najednou: jeden <strong class="text-white">with-skill</strong> a jeden jako <strong class="text-white">baseline</strong> (bez skill nebo stará verze). Výsledky se porovnávají kvantitativně i kvalitativně.</p>
+
+    <div class="grid gap-3 sm:grid-cols-2 mb-4">
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-emerald-400 font-bold text-xs mb-1">📊 Benchmark tab</div>
+        <div class="text-xs text-gray-400">Pass rate, čas, počet tokenů pro každou konfiguraci. Mean ± stddev, delta mezi verzemi, analytické poznatky.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-emerald-400 font-bold text-xs mb-1">👁️ Outputs tab</div>
+        <div class="text-xs text-gray-400">Prompt + výstup pro každý test case. Feedback textbox s auto-save. "Submit All Reviews" → <code class="text-sky-300">feedback.json</code>.</div>
+      </div>
+    </div>
+
+    <div class="bg-gray-800/50 rounded-lg p-3 font-mono text-xs space-y-1 text-gray-300">
+      <div class="text-gray-500"># Spuštění eval vieweru</div>
+      <div>python eval-viewer/generate_review.py &lt;workspace&gt;/iteration-N \</div>
+      <div class="pl-4">--skill-name "my-skill" --benchmark benchmark.json</div>
+      <div class="mt-2 text-gray-500"># Agregace výsledků</div>
+      <div>python -m scripts.aggregate_benchmark &lt;workspace&gt;/iteration-N \</div>
+      <div class="pl-4">--skill-name &lt;name&gt;</div>
+    </div>
+  </div>
+
+  <!-- Description optimalizace -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Optimalizace description (trigger loop)</h3>
+    <p class="text-sm text-gray-400 mb-3">Pole <code class="text-sky-300 text-xs">description</code> v SKILL.md frontmatter je primárním mechanismem spouštění. Skill creator ho automaticky optimalizuje pomocí iterativního eval loopу.</p>
+
+    <ol class="space-y-2 text-sm">
+      <li class="flex items-start gap-2">
+        <span class="badge badge-slate text-xs shrink-0 mt-0.5">1</span>
+        <span class="text-gray-400">Vygeneruje <strong class="text-white">20 eval queries</strong> – mix should-trigger / should-not-trigger (realistické, konkrétní, s kontextem)</span>
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="badge badge-slate text-xs shrink-0 mt-0.5">2</span>
+        <span class="text-gray-400">Zobrazí je v HTML revieweru, uživatel může editovat a potvrdit</span>
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="badge badge-slate text-xs shrink-0 mt-0.5">3</span>
+        <span class="text-gray-400">Spustí <code class="text-sky-300 text-xs">run_loop.py</code> – 60 % train / 40 % held-out test, max 5 iterací, každou query testuje 3× pro reliabilitu</span>
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="badge badge-slate text-xs shrink-0 mt-0.5">4</span>
+        <span class="text-gray-400">Claude s extended thinking navrhuje vylepšení; vybírá se nejlepší dle <em>test score</em> (ne train – prevence overfittingu)</span>
+      </li>
+      <li class="flex items-start gap-2">
+        <span class="badge badge-slate text-xs shrink-0 mt-0.5">5</span>
+        <span class="text-gray-400">Výsledný <code class="text-sky-300 text-xs">best_description</code> se zapíše zpět do SKILL.md</span>
+      </li>
+    </ol>
+
+    <div class="mt-3 bg-gray-800/50 rounded-lg p-3 font-mono text-xs text-gray-300">
+      <div class="text-gray-500"># Spuštění trigger optimalizace</div>
+      <div>python -m scripts.run_loop \</div>
+      <div class="pl-4">--eval-set trigger-eval.json \</div>
+      <div class="pl-4">--skill-path ./my-skill \</div>
+      <div class="pl-4">--model claude-sonnet-4-6 \</div>
+      <div class="pl-4">--max-iterations 5 --verbose</div>
+    </div>
+  </div>
+
+  <!-- Agenti -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Agenti (3)</h3>
+    <div class="space-y-2">
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">📏</span>
+        <div>
+          <div class="font-medium text-white text-sm">grader</div>
+          <div class="text-xs text-gray-400 mt-0.5">Vyhodnocuje assertions proti výstupům. Generuje <code class="text-sky-300">grading.json</code> s polem <code class="text-sky-300">text / passed / evidence</code> pro každý assertion.</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🔀</span>
+        <div>
+          <div class="font-medium text-white text-sm">comparator</div>
+          <div class="text-xs text-gray-400 mt-0.5">Slepé A/B porovnání dvou výstupů. Dostane oba výstupy bez označení a rozhodne, který je lepší. Pro přísnější srovnání verzí.</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🔬</span>
+        <div>
+          <div class="font-medium text-white text-sm">analyzer</div>
+          <div class="text-xs text-gray-400 mt-0.5">Analyzuje benchmark výsledky a hledá vzory: nediskriminující assertions, nestabilní evaly (flaky), časové a tokenové trade-offy.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Python skripty -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Python skripty (7)</h3>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <div class="p-2.5 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 text-xs">run_eval.py</code>
+        <p class="text-xs text-gray-500 mt-0.5">Spustí jeden eval průchod</p>
+      </div>
+      <div class="p-2.5 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 text-xs">run_loop.py</code>
+        <p class="text-xs text-gray-500 mt-0.5">Celý trigger optimalizační loop</p>
+      </div>
+      <div class="p-2.5 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 text-xs">aggregate_benchmark.py</code>
+        <p class="text-xs text-gray-500 mt-0.5">Agreguje výsledky → benchmark.json + .md</p>
+      </div>
+      <div class="p-2.5 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 text-xs">improve_description.py</code>
+        <p class="text-xs text-gray-500 mt-0.5">Navrhuje vylepšení description</p>
+      </div>
+      <div class="p-2.5 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 text-xs">package_skill.py</code>
+        <p class="text-xs text-gray-500 mt-0.5">Zabalí skill do .skill souboru</p>
+      </div>
+      <div class="p-2.5 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 text-xs">quick_validate.py</code>
+        <p class="text-xs text-gray-500 mt-0.5">Rychlá validace struktury skill</p>
+      </div>
+      <div class="p-2.5 rounded-lg bg-gray-800/50">
+        <code class="text-sky-300 text-xs">generate_report.py</code>
+        <p class="text-xs text-gray-500 mt-0.5">Generuje textový report z výsledků</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jak ovládat -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Jak ovládat</h3>
+    <div class="space-y-2 text-sm">
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Chci vytvořit skill pro X"</div>
+        <div class="text-gray-500 text-xs">→ Skill creator provede celým procesem od nuly: interview, draft, test cases, eval loop</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Vylepši tento existující skill" / "Otestuj skill"</div>
+        <div class="text-gray-500 text-xs">→ Přeskočí na eval/iterate část loopу s existující verzí jako baseline</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Optimalizuj description pro lepší spouštění"</div>
+        <div class="text-gray-500 text-xs">→ Spustí trigger optimalizaci s <code class="text-sky-300">run_loop.py</code> a extended thinking</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Benchmark výkon skill" / "Porovnej dvě verze"</div>
+        <div class="text-gray-500 text-xs">→ Spustí blind A/B porovnání přes agenta comparator</div>
+      </div>
+    </div>
+    <div class="mt-3 p-3 rounded-lg bg-emerald-900/20 border border-emerald-800/30 text-xs text-emerald-300">
+      💡 Skill creator se přizpůsobuje technické zdatnosti uživatele – automaticky zjednodušuje nebo prohlubuje vysvětlení pojmů jako "assertion", "benchmark" nebo "JSON".
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ PLUGIN DEV -->
+<section id="tab-plugindev" class="plugin-section space-y-5">
+  <div class="rounded-xl border border-amber-900/50 bg-gray-900 p-5">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-2xl">🔧</span>
+          <h2 class="text-lg font-bold text-white">Plugin Dev Toolkit</h2>
+        </div>
+        <p class="text-sm text-gray-400">Kompletní sada nástrojů pro vývoj vlastních Claude Code pluginů. 7 specializovaných skills pokrývá celý lifecycle: od struktury a příkazů přes hooks a MCP integraci až po publikování.</p>
+      </div>
+      <span class="badge badge-amber shrink-0">v0.1.0</span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-amber">7 skills</span>
+      <span class="badge badge-rose">3 agenti</span>
+      <span class="badge badge-blue">1 příkaz</span>
+      <span class="badge badge-slate">Daisy / Anthropic</span>
+      <span class="badge badge-green">MIT</span>
+    </div>
+  </div>
+
+  <!-- Hlavní příkaz -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-1">Hlavní příkaz: <code class="text-amber-300 text-sm">/plugin-dev:create-plugin</code></h3>
+    <p class="text-sm text-gray-400 mb-4">Guided end-to-end workflow pro vytvoření pluginu od nuly. 8 fází s kontrolními body a automatickým načítáním relevantních skills.</p>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">1</span>
+        <span class="text-gray-300">Discovery – účel a požadavky</span>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">2</span>
+        <span class="text-gray-300">Component Planning</span>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">3</span>
+        <span class="text-gray-300">Detailed Design</span>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">4</span>
+        <span class="text-gray-300">Structure Creation</span>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">5</span>
+        <span class="text-gray-300">Component Implementation</span>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">6</span>
+        <span class="text-gray-300">Validation</span>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">7</span>
+        <span class="text-gray-300">Testing</span>
+      </div>
+      <div class="flex items-center gap-2 p-2.5 rounded-lg bg-gray-800/50 text-sm">
+        <span class="w-5 h-5 rounded-full bg-amber-900/60 text-amber-300 text-xs font-bold flex items-center justify-center shrink-0">8</span>
+        <span class="text-gray-300">Documentation &amp; Distribution</span>
+      </div>
+    </div>
+    <div class="mt-3 bg-gray-800/50 rounded-lg p-3 font-mono text-xs text-amber-300">
+      /plugin-dev:create-plugin<br>
+      /plugin-dev:create-plugin A plugin for managing database migrations
+    </div>
+  </div>
+
+  <!-- 7 Skills -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-4">Skills (7)</h3>
+    <div class="space-y-2">
+
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🏗️</span>
+            <div>
+              <span class="font-medium text-white text-sm">plugin-structure</span>
+              <span class="badge badge-slate ml-2">základ</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Struktura adresářů, formát plugin.json manifestu, auto-discovery komponent, konvence pojmenování souborů, vzory pro minimální/standardní/pokročilý plugin. Použití <code class="text-sky-300 text-xs">${CLAUDE_PLUGIN_ROOT}</code>.</p>
+          <div class="bg-gray-800 rounded p-2 font-mono text-xs text-sky-300">"plugin structure" / "plugin.json manifest" / "auto-discovery" / "component organization"</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">⚡</span>
+            <div>
+              <span class="font-medium text-white text-sm">hook-development</span>
+              <span class="badge badge-amber ml-2">event-driven</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Prompt-based hooks (doporučeno) s LLM rozhodováním. Všechny hook eventy: <code class="text-sky-300 text-xs">PreToolUse, PostToolUse, Stop, SubagentStop, SessionStart, SessionEnd, UserPromptSubmit, PreCompact, Notification</code>. Výstupní formáty, JSON schémata, bezpečnostní best practices.</p>
+          <p class="text-xs">Nástroje: <code class="text-green-400 text-xs">validate-hook-schema.sh</code>, <code class="text-green-400 text-xs">test-hook.sh</code>, <code class="text-green-400 text-xs">hook-linter.sh</code></p>
+          <div class="bg-gray-800 rounded p-2 font-mono text-xs text-sky-300">"create a hook" / "PreToolUse hook" / "block dangerous commands"</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🔌</span>
+            <div>
+              <span class="font-medium text-white text-sm">mcp-integration</span>
+              <span class="badge badge-blue ml-2">externí služby</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Konfigurace MCP serverů v <code class="text-sky-300 text-xs">.mcp.json</code> vs <code class="text-sky-300 text-xs">plugin.json</code>. Všechny typy serverů: <strong class="text-gray-300">stdio</strong> (lokální), <strong class="text-gray-300">SSE</strong> (hosted/OAuth), <strong class="text-gray-300">HTTP</strong> (REST), <strong class="text-gray-300">WebSocket</strong> (real-time). Autentizace: OAuth, tokeny, env proměnné.</p>
+          <div class="bg-gray-800 rounded p-2 font-mono text-xs text-sky-300">"add MCP server" / "integrate MCP" / "configure .mcp.json" / "connect external service"</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">💬</span>
+            <div>
+              <span class="font-medium text-white text-sm">command-development</span>
+              <span class="badge badge-blue ml-2">slash příkazy</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Struktura slash příkazů a markdown formát. YAML frontmatter pole (<code class="text-sky-300 text-xs">description, argument-hint, allowed-tools</code>). Dynamické argumenty, file references, bash execution pro kontext, organizace a namespacování příkazů.</p>
+          <div class="bg-gray-800 rounded p-2 font-mono text-xs text-sky-300">"create a slash command" / "command frontmatter" / "define command arguments"</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🤖</span>
+            <div>
+              <span class="font-medium text-white text-sm">agent-development</span>
+              <span class="badge badge-rose ml-2">autonomní agenti</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Struktura agentů (YAML frontmatter + system prompt). Všechna frontmatter pole (<code class="text-sky-300 text-xs">name, description, model, color, tools</code>). Formát description s <code class="text-sky-300 text-xs">&lt;example&gt;</code> bloky pro spolehlivé spouštění. Vzory pro 4 typy: analýza, generování, validace, orchestrace.</p>
+          <p class="text-xs">Nástroj: <code class="text-green-400 text-xs">validate-agent.sh</code></p>
+          <div class="bg-gray-800 rounded p-2 font-mono text-xs text-sky-300">"create an agent" / "add an agent" / "write a subagent" / "agent frontmatter"</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">🧩</span>
+            <div>
+              <span class="font-medium text-white text-sm">skill-development</span>
+              <span class="badge badge-violet ml-2">skills</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Struktura skill souborů (SKILL.md s YAML frontmatter). Progressive disclosure princip: metadata → SKILL.md → resources. Silné trigger popisy, styl psaní (imperativní forma, třetí osoba). Organizace bundlovaných resources (<code class="text-sky-300 text-xs">references/, examples/, scripts/</code>).</p>
+          <div class="bg-gray-800 rounded p-2 font-mono text-xs text-sky-300">"create a skill" / "add a skill to plugin" / "improve skill description"</div>
+        </div>
+      </div>
+
+      <div class="rounded-lg border border-gray-700 overflow-hidden">
+        <button class="w-full flex items-center justify-between p-3 bg-gray-800/50 hover:bg-gray-800 transition-colors text-left" onclick="toggleCollapsible(this)">
+          <div class="flex items-center gap-3">
+            <span class="text-lg">⚙️</span>
+            <div>
+              <span class="font-medium text-white text-sm">plugin-settings</span>
+              <span class="badge badge-slate ml-2">konfigurace</span>
+            </div>
+          </div>
+          <span class="text-gray-500 transition-transform">▶</span>
+        </button>
+        <div class="collapsible-body px-4 py-3 bg-gray-900/50 text-sm text-gray-400 space-y-2">
+          <p>Pattern <code class="text-sky-300 text-xs">.claude/plugin-name.local.md</code> pro konfiguraci. YAML frontmatter + markdown body. Parsovací techniky (sed, awk, grep). Dočasně aktivní hooks přes flag soubory. Atomické aktualizace a gitignore správa.</p>
+          <p class="text-xs">Nástroje: <code class="text-green-400 text-xs">validate-settings.sh</code>, <code class="text-green-400 text-xs">parse-frontmatter.sh</code></p>
+          <div class="bg-gray-800 rounded p-2 font-mono text-xs text-sky-300">"plugin settings" / "store plugin configuration" / ".local.md files" / "per-project plugin settings"</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Agenti -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Agenti (3)</h3>
+    <div class="space-y-2">
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🛠️</span>
+        <div>
+          <div class="font-medium text-white text-sm">agent-creator</div>
+          <div class="text-xs text-gray-400 mt-0.5">AI-asistovaná generace nových agentů. Spouští se při "create an agent", "generate an agent", "make me an agent that…"</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">✅</span>
+        <div>
+          <div class="font-medium text-white text-sm">plugin-validator</div>
+          <div class="text-xs text-gray-400 mt-0.5">Validace struktury pluginu a plugin.json. Spouští se při "validate my plugin", "check plugin structure", "verify plugin is correct"</div>
+        </div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 flex items-start gap-3">
+        <span class="text-lg shrink-0">🔍</span>
+        <div>
+          <div class="font-medium text-white text-sm">skill-reviewer</div>
+          <div class="text-xs text-gray-400 mt-0.5">Kontrola kvality skills. Spouští se při "review my skill", "check skill quality", "improve skill description"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Best practices -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Best practices</h3>
+    <div class="grid gap-2 sm:grid-cols-2 text-sm">
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-amber-400 font-bold mb-1 text-xs">🔐 Security First</div>
+        <div class="text-gray-400 text-xs">Validace vstupů v hooks, HTTPS/WSS pro MCP, env proměnné pro credentials, princip nejmenších oprávnění.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-amber-400 font-bold mb-1 text-xs">📦 Portabilita</div>
+        <div class="text-gray-400 text-xs">Vždy <code class="text-sky-300">${CLAUDE_PLUGIN_ROOT}</code>, pouze relativní cesty, substituce env proměnných.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-amber-400 font-bold mb-1 text-xs">🧪 Testování</div>
+        <div class="text-gray-400 text-xs">Validace konfigurací před nasazením, testování hooks s ukázkovými vstupy, debug mode (<code class="text-sky-300">claude --debug</code>).</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-amber-400 font-bold mb-1 text-xs">📖 Dokumentace</div>
+        <div class="text-gray-400 text-xs">Jasné README soubory, dokumentované env proměnné, příklady použití.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ FRONTEND DESIGN -->
+<section id="tab-frontend" class="plugin-section space-y-5">
+  <div class="rounded-xl border border-pink-900/50 bg-gray-900 p-5">
+    <div class="flex items-start justify-between gap-3 mb-3">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-2xl">🎨</span>
+          <h2 class="text-lg font-bold text-white">Frontend Design</h2>
+        </div>
+        <p class="text-sm text-gray-400">Generuje produkční frontend interfaces s výraznými estetickými volbami. Cílem je vyhnout se generickému "AI slop" vzhledu a vytvářet nezapomenutelná, kontextově přesná UI.</p>
+      </div>
+      <span class="badge badge-green shrink-0">user-scope</span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-violet">1 skill</span>
+      <span class="badge badge-slate">Prithvi &amp; Alexander / Anthropic</span>
+    </div>
+  </div>
+
+  <!-- Jak funguje -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Jak funguje</h3>
+    <p class="text-sm text-gray-400 mb-4">Skill se spouští automaticky, jakmile Claude dostane zadání pro frontend – komponentu, stránku, aplikaci. Před psaním kódu zvolí jasný estetický směr a pak ho precizně implementuje.</p>
+    <div class="grid gap-3 sm:grid-cols-3">
+      <div class="p-3 rounded-lg bg-gray-800/50 text-center">
+        <div class="text-2xl mb-2">🎯</div>
+        <div class="font-bold text-white text-sm">Estetický směr</div>
+        <div class="text-xs text-gray-400 mt-1">Zvolí jasný záměr: brutálně minimální, maximalistický chaos, retro-futurismus, luxusní…</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 text-center">
+        <div class="text-2xl mb-2">⚡</div>
+        <div class="font-bold text-white text-sm">Produkční kód</div>
+        <div class="text-xs text-gray-400 mt-1">HTML/CSS/JS, React, Vue – funkční kód s precizní pozorností k detailům.</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50 text-center">
+        <div class="text-2xl mb-2">🚫</div>
+        <div class="font-bold text-white text-sm">Žádný AI slop</div>
+        <div class="text-xs text-gray-400 mt-1">Zakázány generické fonty (Inter, Roboto), fialové gradienty, předvídatelné layouty.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design principy -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-4">Design principy</h3>
+    <div class="space-y-3">
+
+      <div class="p-3 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-base">🔤</span>
+          <h4 class="font-bold text-white text-sm">Typografie</h4>
+        </div>
+        <p class="text-xs text-gray-400">Jedinečné a zajímavé fonty. Kombinace výrazného display fontu s vytříbeným body fontem. Nikdy Arial, Inter, Roboto, system fonts.</p>
+      </div>
+
+      <div class="p-3 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-base">🎨</span>
+          <h4 class="font-bold text-white text-sm">Barvy &amp; téma</h4>
+        </div>
+        <p class="text-xs text-gray-400">CSS proměnné pro konzistenci. Dominantní barvy s ostrými akcenty předčí bojácné, rovnoměrně rozložené palety. Střídání světlých a tmavých témat.</p>
+      </div>
+
+      <div class="p-3 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-base">✨</span>
+          <h4 class="font-bold text-white text-sm">Animace &amp; pohyb</h4>
+        </div>
+        <p class="text-xs text-gray-400">CSS-first animace pro HTML. Motion library pro React. Jedna dobře orchestrovaná page load animace s staggered reveals vytváří více radosti než roztroušené micro-interakce.</p>
+      </div>
+
+      <div class="p-3 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-base">📐</span>
+          <h4 class="font-bold text-white text-sm">Prostorová kompozice</h4>
+        </div>
+        <p class="text-xs text-gray-400">Neočekávané layouty. Asymetrie. Překryvy. Diagonální tok. Prvky prolomující grid. Velkorysý negativní prostor NEBO kontrolovaná hustota.</p>
+      </div>
+
+      <div class="p-3 rounded-lg border border-gray-700 bg-gray-800/30">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-base">🌌</span>
+          <h4 class="font-bold text-white text-sm">Pozadí &amp; vizuální detaily</h4>
+        </div>
+        <p class="text-xs text-gray-400">Atmosféra místo plných barev. Gradient mesh, noise textury, geometrické vzory, dramatické stíny, vlastní kurzory, grain overlay, dekorativní orámování.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estetické směry -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Dostupné estetické směry</h3>
+    <div class="flex flex-wrap gap-2">
+      <span class="badge badge-slate">Brutálně minimální</span>
+      <span class="badge badge-slate">Maximalistický chaos</span>
+      <span class="badge badge-slate">Retro-futurismus</span>
+      <span class="badge badge-slate">Organický / přírodní</span>
+      <span class="badge badge-slate">Luxusní / vytříbený</span>
+      <span class="badge badge-slate">Hravý / toy-like</span>
+      <span class="badge badge-slate">Editoriální / magazín</span>
+      <span class="badge badge-slate">Brutalistický / raw</span>
+      <span class="badge badge-slate">Art Deco / geometrický</span>
+      <span class="badge badge-slate">Soft / pastelový</span>
+      <span class="badge badge-slate">Industriální / utilitární</span>
+    </div>
+    <p class="text-xs text-gray-500 mt-3">Klíč není intenzita, ale záměrnost. Precizní brutalismus i rafinovaný minimalismus fungují – pokud jsou provedeny s plným odhodláním.</p>
+  </div>
+
+  <!-- Příklady -->
+  <div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
+    <h3 class="font-bold text-white mb-3">Jak ovládat</h3>
+    <p class="text-sm text-gray-400 mb-3">Skill se aktivuje automaticky při jakémkoliv frontend zadání. Stačí popsat, co chceš postavit.</p>
+    <div class="space-y-2 text-sm">
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Vytvoř dashboard pro hudební streaming aplikaci"</div>
+        <div class="text-gray-500 text-xs">→ skill vybere estetický směr (např. temný editoriální styl) a implementuje produkční kód</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Postav landing page pro AI security startup"</div>
+        <div class="text-gray-500 text-xs">→ skill zvolí výraznou estetiku odpovídající kontextu (industriální / high-tech)</div>
+      </div>
+      <div class="p-3 rounded-lg bg-gray-800/50">
+        <div class="text-gray-300 mb-1">"Navrhni settings panel s dark mode"</div>
+        <div class="text-gray-500 text-xs">→ skill implementuje vytříbené UI s precizní pozorností k spacingu a typografii</div>
+      </div>
+    </div>
+    <div class="mt-4 p-3 rounded-lg bg-pink-900/20 border border-pink-800/30 text-xs text-pink-300">
+      💡 Žádný design by neměl vypadat stejně jako jiný. Skill záměrně variuje fonty, barvy a estetiky mezi každou generací.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-gray-800 bg-gray-900/50 px-4 py-4 mt-6">
+  <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-600">
+    <span>Claude Code · plot2pod · 4 aktivní pluginy</span>
+    <span>Vygenerováno: 2026-03-12</span>
+  </div>
+</footer>
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.plugin-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleCollapsible(btn) {
+    const body = btn.nextElementSibling;
+    const arrow = btn.querySelector('span:last-child');
+    body.classList.toggle('open');
+    arrow.style.transform = body.classList.contains('open') ? 'rotate(90deg)' : '';
+  }
+</script>
+</body>
+</html>

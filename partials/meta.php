@@ -36,3 +36,5 @@ $ogImage   = isset($metaOgImage) ? htmlspecialchars($metaOgImage) : htmlspecialc
     <meta name="twitter:title"       content="<?= $title ?>">
     <meta name="twitter:description" content="<?= $desc ?>">
     <meta name="twitter:image"       content="<?= $ogImage ?>">
+
+    <link rel="alternate" type="application/rss+xml" title="plot2pod" href="<?= $siteUrl ?>/feed.php">

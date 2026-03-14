@@ -54,12 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Send done notification — only once
                 if ($newStatus === 'done' && $podcastId) {
-                    $req = $pdo->query(
+                    $reqStmt = $pdo->prepare(
                         "SELECT r.*, u.email AS user_email, u.name AS user_name
                          FROM requests r
                          JOIN users u ON u.id = r.user_id
-                         WHERE r.id = $reqId"
-                    )->fetch();
+                         WHERE r.id = ?"
+                    );
+                    $reqStmt->execute([$reqId]);
+                    $req = $reqStmt->fetch();
 
                     if ($req && empty($req['notified_at'])) {
                         $pod = $pdo->prepare("SELECT slug FROM podcasts WHERE id = ?");

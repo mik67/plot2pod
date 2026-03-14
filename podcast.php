@@ -33,7 +33,7 @@ if (!$podcast) {
     $metaCanonical = rtrim(SITE_URL, '/') . '/podcast.php?id=' . $podcast['id'];
     include __DIR__ . '/partials/meta.php';
     ?>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=<?= filemtime(__DIR__ . '/css/style.css') ?>">
     <script type="application/ld+json">
     <?= json_encode([
         '@context'        => 'https://schema.org',

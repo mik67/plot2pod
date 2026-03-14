@@ -67,6 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $podSlug = $pod->fetchColumn();
                         if ($podSlug) {
                             sendDoneNotification($req['user_email'], $req['user_name'], $podSlug);
+                        } else {
+                            error_log("plot2pod: could not send done notification — no slug for podcast_id=$podcastId");
                         }
                         $pdo->prepare("UPDATE requests SET notified_at = NOW() WHERE id = ?")
                             ->execute([$reqId]);

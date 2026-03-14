@@ -490,12 +490,14 @@ body.home main { padding: 0; }
 }
 
 .podcasts-section h2 {
-  margin-bottom: 1.75rem;
+  margin-bottom: 0.25rem;
   text-align: center;
-  font-weight: 300;
 }
-.podcasts-section h2 .h2-lead {
-  font-weight: 700;
+.podcasts-section .section-sub {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
 }
 .podcasts-section h2 small {
   font-family: 'Figtree', sans-serif;

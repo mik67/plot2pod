@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newStatus = $_POST['status']            ?? '';
             $podcastId = !empty($_POST['podcast_id']) ? (int)$_POST['podcast_id'] : null;
 
-            if (!in_array($newStatus, ['pending', 'processing', 'done', 'rejected', 'deleted'], true)) {
+            if (!in_array($newStatus, ['pending', 'processing', 'done'], true)) {
                 $message = 'Invalid status.';
                 $msgType = 'error';
             } elseif (!$reqId) {
@@ -122,20 +122,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($action === 'delete_request') {
             $reqId = (int)($_POST['request_id'] ?? 0);
             if ($reqId) {
-                $pdo->prepare(
-                    "UPDATE requests SET status = 'deleted' WHERE id = ?"
-                )->execute([$reqId]);
-                $message = 'Request #' . $reqId . ' deleted.';
+                $stmt = $pdo->prepare("UPDATE requests SET status = 'deleted' WHERE id = ?");
+                $stmt->execute([$reqId]);
+                $message = $stmt->rowCount() ? 'Request #' . $reqId . ' deleted.' : 'Request not found.';
             }
 
         // ── Soft delete podcast ──────────────────────────────────────
         } elseif ($action === 'delete_podcast') {
             $podId = (int)($_POST['podcast_id'] ?? 0);
             if ($podId) {
-                $pdo->prepare(
-                    "UPDATE podcasts SET deleted = 1 WHERE id = ?"
-                )->execute([$podId]);
-                $message = 'Podcast deleted.';
+                $stmt = $pdo->prepare("UPDATE podcasts SET deleted = 1 WHERE id = ?");
+                $stmt->execute([$podId]);
+                $message = $stmt->rowCount() ? 'Podcast deleted.' : 'Podcast not found.';
             }
 
         // ── Edit podcast ─────────────────────────────────────────────

@@ -55,6 +55,26 @@ if (!$podcast) {
         'datePublished'   => date('Y-m-d', strtotime($podcast['created_at'])),
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
     </script>
+    <script type="application/ld+json">
+    <?= json_encode([
+        '@context'        => 'https://schema.org',
+        '@type'           => 'BreadcrumbList',
+        'itemListElement' => [
+            [
+                '@type'    => 'ListItem',
+                'position' => 1,
+                'name'     => 'Home',
+                'item'     => rtrim(SITE_URL, '/') . '/',
+            ],
+            [
+                '@type'    => 'ListItem',
+                'position' => 2,
+                'name'     => $podcast['title'],
+                'item'     => SITE_URL . '/podcast.php?id=' . (int)$podcast['id'],
+            ],
+        ],
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
+    </script>
 </head>
 <body>
 <?php include __DIR__ . '/partials/header.php'; ?>

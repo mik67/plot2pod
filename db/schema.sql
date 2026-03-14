@@ -13,12 +13,15 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS podcasts (
     id          INT AUTO_INCREMENT PRIMARY KEY,
     title       VARCHAR(200) NOT NULL,
+    slug        VARCHAR(200) NOT NULL DEFAULT '',
     description TEXT         NOT NULL,
     mp3_path    VARCHAR(500) NOT NULL,
     duration    INT          NOT NULL DEFAULT 0,
     created_at  DATETIME     NOT NULL DEFAULT NOW(),
     published   TINYINT(1)   NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
+-- Unique slug index (added in migration)
+-- ALTER TABLE podcasts ADD UNIQUE KEY uq_podcast_slug (slug);
 
 CREATE TABLE IF NOT EXISTS requests (
     id           INT AUTO_INCREMENT PRIMARY KEY,

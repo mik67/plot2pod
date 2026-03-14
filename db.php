@@ -1,6 +1,40 @@
 <?php
 require_once __DIR__ . '/config.php';
 
+/**
+ * Convert a string to a URL-safe slug.
+ */
+function slugify(string $title): string {
+    $slug = function_exists('mb_strtolower')
+        ? mb_strtolower($title, 'UTF-8')
+        : strtolower($title);
+    $slug = preg_replace('/[^\w\s-]/u', '', $slug);
+    $slug = preg_replace('/[\s_]+/', '-', $slug);
+    $slug = preg_replace('/-{2,}/', '-', $slug);
+    $slug = trim($slug, '-');
+    return function_exists('mb_substr')
+        ? mb_substr($slug, 0, 200)
+        : substr($slug, 0, 200);
+}
+
+/**
+ * Generate a slug from title, appending -2, -3 etc. if it already exists in the DB.
+ */
+function generateUniqueSlug(PDO $pdo, string $title): string {
+    $base = slugify($title);
+    $slug = $base;
+    $i    = 2;
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM podcasts WHERE slug = ?");
+    while (true) {
+        $stmt->execute([$slug]);
+        if ((int)$stmt->fetchColumn() === 0) {
+            break;
+        }
+        $slug = $base . '-' . $i++;
+    }
+    return $slug;
+}
+
 try {
     $dsn = sprintf('mysql:host=%s;dbname=%s;charset=%s',
         DB_HOST, DB_NAME, DB_CHARSET);
@@ -12,6 +46,9 @@ try {
     ]);
 } catch (PDOException $e) {
     error_log('DB connection failed: ' . $e->getMessage());
-    http_response_code(500);
-    die('Database connection error. Please try again later.');
+    if (php_sapi_name() !== 'cli') {
+        http_response_code(500);
+        die('Database connection error. Please try again later.');
+    }
 }
+

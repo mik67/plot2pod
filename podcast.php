@@ -50,7 +50,7 @@ if (!$podcast) {
         'partOfSeries'    => [
             '@type' => 'PodcastSeries',
             'name'  => 'plot2pod',
-            'url'   => SITE_URL,
+            'url'   => rtrim(SITE_URL, '/'),
         ],
         'datePublished'   => date('Y-m-d', strtotime($podcast['created_at'])),
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>

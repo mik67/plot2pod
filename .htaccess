@@ -1,16 +1,14 @@
-# ── Security: block sensitive paths ─────────────────────────────
-<FilesMatch "\.(sql|md|log|env|gitignore)$">
-    Require all denied
+# ── Security: block sensitive files ─────────────────────────────
+<FilesMatch "\.(sql|log|env|gitignore)$">
+    Order allow,deny
+    Deny from all
 </FilesMatch>
 
-<DirectoryMatch "^(.*/)(db|tests|docs|\.git|\.claude)(/|$)">
-    Require all denied
-</DirectoryMatch>
-
-# ── PHP settings ─────────────────────────────────────────────────
-<IfModule mod_php.c>
-    php_flag display_errors Off
-    php_flag log_errors On
+# ── Block sensitive directories ──────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^podcast/([^/]+)/?$ /podcast.php?slug=$1 [L,QSA]
+    RewriteRule ^(tests|docs|\.git|\.claude)(/|$) - [F,L]
 </IfModule>
 
 # ── Compression ──────────────────────────────────────────────────
@@ -21,7 +19,7 @@
 # ── Browser caching for static assets ───────────────────────────
 <IfModule mod_expires.c>
     ExpiresActive On
-    ExpiresByType text/css             "access plus 1 month"
+    ExpiresByType text/css               "access plus 1 month"
     ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType audio/mpeg           "access plus 1 year"
+    ExpiresByType audio/mpeg             "access plus 1 year"
 </IfModule>

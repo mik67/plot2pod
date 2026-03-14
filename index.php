@@ -54,7 +54,7 @@ $podcasts = $pdo->query(
 </section>
 
 <div class="podcasts-section">
-    <h2><span class="h2-lead">Dive in — free podcasts</span><br>on science, politics, tech, and beyond</h2>
+    <h2><span class="h2-lead">Dive in — free podcasts</span><span class="h2-sub">on science, politics, tech, and beyond</span></h2>
         <?php if (empty($podcasts)): ?>
             <div class="empty-state">
                 <p>Podcasts coming soon — be the first to <a href="/register.php">submit a topic</a>!</p>

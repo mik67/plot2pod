@@ -1,5 +1,5 @@
 <?php // expects $p array in scope ?>
-<a href="/podcast.php?id=<?= $p['id'] ?>" class="podcast-card">
+<a href="/podcast/<?= htmlspecialchars($p['slug']) ?>" class="podcast-card">
     <div class="podcast-card-cover">🎙</div>
     <h3><?= htmlspecialchars($p['title']) ?></h3>
     <?php if ($p['description']): ?>

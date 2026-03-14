@@ -6,7 +6,7 @@ header('Content-Type: application/rss+xml; charset=utf-8');
 
 try {
     $podcasts = $pdo->query(
-        "SELECT id, title, description, mp3_path, duration, created_at
+        "SELECT id, slug, title, description, mp3_path, duration, created_at
          FROM podcasts WHERE published = 1 ORDER BY created_at DESC"
     )->fetchAll();
 } catch (Exception $e) {
@@ -23,7 +23,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     <description>AI-generated debate-format podcasts on any topic</description>
     <language>en-us</language>
     <?php foreach ($podcasts as $p):
-        $url    = $base . '/podcast.php?id=' . (int)$p['id'];
+        $url    = $base . '/podcast/' . $p['slug'];
         $mp3    = str_starts_with($p['mp3_path'], 'http') ? $p['mp3_path'] : $base . $p['mp3_path'];
         $pubDate = date(DATE_RSS, strtotime($p['created_at']));
     ?>

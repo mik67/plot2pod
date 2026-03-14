@@ -497,6 +497,7 @@ body.home main { padding: 0; }
   text-align: center;
   font-size: 0.95rem;
   color: var(--text-muted);
+  margin-top: 0;
   margin-bottom: 1.75rem;
 }
 .podcasts-section h2 small {

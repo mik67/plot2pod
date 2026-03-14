@@ -237,19 +237,59 @@ $done    = count(array_filter($requests, fn($r) => $r['status'] === 'done'));
             <div class="admin-podcasts">
                 <?php foreach ($podcasts as $p): ?>
                 <div class="admin-podcast-row <?= $p['published'] ? '' : 'unpublished' ?>">
-                    <div>
+                    <div class="admin-podcast-info">
                         <strong><?= htmlspecialchars($p['title']) ?></strong>
                         <span class="status-badge <?= $p['published'] ? 'status-done' : 'status-pending' ?>">
                             <?= $p['published'] ? 'published' : 'hidden' ?>
                         </span>
                         <small><?= date('M j, Y', strtotime($p['created_at'])) ?></small>
+                        <small class="text-muted">/podcast/<?= htmlspecialchars($p['slug']) ?></small>
                     </div>
-                    <form method="POST" action="/admin.php" style="display:inline">
+                    <div class="admin-podcast-actions">
+                        <!-- Toggle published -->
+                        <form method="POST" action="/admin.php" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                            <input type="hidden" name="action"     value="toggle_published">
+                            <input type="hidden" name="podcast_id" value="<?= $p['id'] ?>">
+                            <button type="submit" class="btn-small">
+                                <?= $p['published'] ? 'Hide' : 'Publish' ?>
+                            </button>
+                        </form>
+                        <!-- Edit toggle -->
+                        <button type="button" class="btn-small"
+                            onclick="document.getElementById('edit-<?= $p['id'] ?>').classList.toggle('hidden')">
+                            Edit
+                        </button>
+                        <!-- Delete -->
+                        <form method="POST" action="/admin.php" style="display:inline"
+                              onsubmit="return confirm('Delete this podcast? This cannot be undone.')">
+                            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                            <input type="hidden" name="action"     value="delete_podcast">
+                            <input type="hidden" name="podcast_id" value="<?= $p['id'] ?>">
+                            <button type="submit" class="btn-small btn-danger">Delete</button>
+                        </form>
+                    </div>
+                    <!-- Inline edit form -->
+                    <form method="POST" action="/admin.php" class="admin-form edit-form hidden" id="edit-<?= $p['id'] ?>">
                         <input type="hidden" name="csrf_token"  value="<?= $csrf ?>">
-                        <input type="hidden" name="action"      value="toggle_published">
+                        <input type="hidden" name="action"      value="edit_podcast">
                         <input type="hidden" name="podcast_id"  value="<?= $p['id'] ?>">
-                        <button type="submit" class="btn-small">
-                            <?= $p['published'] ? 'Hide' : 'Publish' ?>
+                        <label>Title
+                            <input type="text" name="title" value="<?= htmlspecialchars($p['title']) ?>" required>
+                        </label>
+                        <label>Description
+                            <textarea name="description" rows="2"><?= htmlspecialchars($p['description']) ?></textarea>
+                        </label>
+                        <label>MP3 path
+                            <input type="text" name="mp3_path" value="<?= htmlspecialchars($p['mp3_path']) ?>" required>
+                        </label>
+                        <label>Duration <small>(seconds)</small>
+                            <input type="number" name="duration" value="<?= $p['duration'] ?>" min="0">
+                        </label>
+                        <button type="submit">Save changes</button>
+                        <button type="button"
+                            onclick="document.getElementById('edit-<?= $p['id'] ?>').classList.add('hidden')">
+                            Cancel
                         </button>
                     </form>
                 </div>

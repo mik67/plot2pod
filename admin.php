@@ -28,9 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Title and MP3 path are required.';
                 $msgType = 'error';
             } else {
+                $slug = generateUniqueSlug($pdo, $title);
                 $pdo->prepare(
-                    "INSERT INTO podcasts (title, description, mp3_path, duration) VALUES (?, ?, ?, ?)"
-                )->execute([$title, $desc, $mp3path, $duration]);
+                    "INSERT INTO podcasts (title, slug, description, mp3_path, duration) VALUES (?, ?, ?, ?, ?)"
+                )->execute([$title, $slug, $desc, $mp3path, $duration]);
                 $message = 'Podcast added successfully.';
             }
 

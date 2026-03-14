@@ -328,6 +328,9 @@ $done    = count(array_filter($requests, fn($r) => $r['status'] === 'done'));
                             <?php else: ?>
                                 <?= htmlspecialchars($r['content']) ?>
                             <?php endif; ?>
+                            <?php if ($r['status'] === 'rejected' && $r['reject_reason']): ?>
+                                <em class="reject-reason">Rejected: <?= htmlspecialchars($r['reject_reason']) ?></em>
+                            <?php endif; ?>
                         </div>
 
                         <form method="POST" action="/admin.php" class="admin-request-form">
@@ -355,6 +358,26 @@ $done    = count(array_filter($requests, fn($r) => $r['status'] === 'done'));
 
                             <button type="submit">Update</button>
                         </form>
+
+                        <?php if (!in_array($r['status'], ['rejected', 'done', 'deleted'])): ?>
+                        <form method="POST" action="/admin.php" class="admin-reject-form">
+                            <input type="hidden" name="csrf_token"  value="<?= $csrf ?>">
+                            <input type="hidden" name="action"      value="reject_request">
+                            <input type="hidden" name="request_id"  value="<?= $r['id'] ?>">
+                            <input type="text" name="reject_reason" placeholder="Rejection reason…" required>
+                            <button type="submit" class="btn-small btn-danger">Reject</button>
+                        </form>
+                        <?php endif; ?>
+
+                        <?php if ($r['status'] !== 'deleted'): ?>
+                        <form method="POST" action="/admin.php" style="display:inline"
+                              onsubmit="return confirm('Remove this request?')">
+                            <input type="hidden" name="csrf_token"  value="<?= $csrf ?>">
+                            <input type="hidden" name="action"      value="delete_request">
+                            <input type="hidden" name="request_id"  value="<?= $r['id'] ?>">
+                            <button type="submit" class="btn-small btn-danger">Remove</button>
+                        </form>
+                        <?php endif; ?>
                     </div>
                     <?php endforeach; ?>
                 </div>

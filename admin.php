@@ -339,7 +339,7 @@ $done    = count(array_filter($requests, fn($r) => $r['status'] === 'done'));
                             <input type="hidden" name="request_id"  value="<?= $r['id'] ?>">
 
                             <select name="status">
-                                <?php foreach (['pending', 'processing', 'done', 'rejected', 'deleted'] as $s): ?>
+                                <?php foreach (['pending', 'processing', 'done'] as $s): ?>
                                     <option value="<?= $s ?>" <?= $r['status'] === $s ? 'selected' : '' ?>>
                                         <?= $s ?>
                                     </option>
@@ -360,7 +360,8 @@ $done    = count(array_filter($requests, fn($r) => $r['status'] === 'done'));
                         </form>
 
                         <?php if (!in_array($r['status'], ['rejected', 'done', 'deleted'])): ?>
-                        <form method="POST" action="/admin.php" class="admin-reject-form">
+                        <form method="POST" action="/admin.php" class="admin-reject-form"
+                              onsubmit="return confirm('Reject this request and notify the user?')">
                             <input type="hidden" name="csrf_token"  value="<?= $csrf ?>">
                             <input type="hidden" name="action"      value="reject_request">
                             <input type="hidden" name="request_id"  value="<?= $r['id'] ?>">

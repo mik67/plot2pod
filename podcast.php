@@ -3,17 +3,20 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+$slug = trim($_GET['slug'] ?? '');
+$id   = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
-if (!$id) {
-    http_response_code(404);
-    include __DIR__ . '/partials/404.php';
-    exit;
+if ($slug !== '') {
+    $stmt = $pdo->prepare("SELECT * FROM podcasts WHERE slug = ? AND published = 1");
+    $stmt->execute([$slug]);
+    $podcast = $stmt->fetch();
+} elseif ($id) {
+    $stmt = $pdo->prepare("SELECT * FROM podcasts WHERE id = ? AND published = 1");
+    $stmt->execute([$id]);
+    $podcast = $stmt->fetch();
+} else {
+    $podcast = false;
 }
-
-$stmt = $pdo->prepare("SELECT * FROM podcasts WHERE id = ? AND published = 1");
-$stmt->execute([$id]);
-$podcast = $stmt->fetch();
 
 if (!$podcast) {
     http_response_code(404);
@@ -30,7 +33,7 @@ if (!$podcast) {
     <?php
     $metaTitle     = $podcast['title'];
     $metaDesc      = $podcast['description'];
-    $metaCanonical = rtrim(SITE_URL, '/') . '/podcast.php?id=' . $podcast['id'];
+    $metaCanonical = rtrim(SITE_URL, '/') . '/podcast/' . $podcast['slug'];
     include __DIR__ . '/partials/meta.php';
     ?>
     <link rel="stylesheet" href="/css/style.css?v=<?= filemtime(__DIR__ . '/css/style.css') ?>">
@@ -40,7 +43,7 @@ if (!$podcast) {
         '@type'           => 'PodcastEpisode',
         'name'            => $podcast['title'],
         'description'     => $podcast['description'],
-        'url'             => rtrim(SITE_URL, '/') . '/podcast.php?id=' . $podcast['id'],
+        'url'             => rtrim(SITE_URL, '/') . '/podcast/' . $podcast['slug'],
         'associatedMedia' => [
             '@type'      => 'MediaObject',
             'contentUrl' => (str_starts_with($podcast['mp3_path'], 'http') ? '' : rtrim(SITE_URL, '/')) . $podcast['mp3_path'],
@@ -70,7 +73,7 @@ if (!$podcast) {
                 '@type'    => 'ListItem',
                 'position' => 2,
                 'name'     => $podcast['title'],
-                'item'     => rtrim(SITE_URL, '/') . '/podcast.php?id=' . (int)$podcast['id'],
+                'item'     => rtrim(SITE_URL, '/') . '/podcast/' . $podcast['slug'],
             ],
         ],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>

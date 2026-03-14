@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newStatus = $_POST['status']            ?? '';
             $podcastId = !empty($_POST['podcast_id']) ? (int)$_POST['podcast_id'] : null;
 
-            if (!in_array($newStatus, ['pending', 'processing', 'done'], true)) {
+            if (!in_array($newStatus, ['pending', 'processing', 'done', 'rejected', 'deleted'], true)) {
                 $message = 'Invalid status.';
                 $msgType = 'error';
             } elseif (!$reqId) {
@@ -87,22 +87,89 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 )->execute([$podId]);
                 $message = 'Podcast visibility toggled.';
             }
+
+        // ── Reject request ───────────────────────────────────────────
+        } elseif ($action === 'reject_request') {
+            $reqId  = (int)($_POST['request_id'] ?? 0);
+            $reason = trim($_POST['reject_reason'] ?? '');
+
+            if (!$reqId || empty($reason)) {
+                $message = 'Request ID and reason are required.';
+                $msgType = 'error';
+            } else {
+                $req = $pdo->prepare(
+                    "SELECT r.*, u.email AS user_email, u.name AS user_name
+                     FROM requests r JOIN users u ON u.id = r.user_id
+                     WHERE r.id = ?"
+                );
+                $req->execute([$reqId]);
+                $reqRow = $req->fetch();
+
+                $pdo->prepare(
+                    "UPDATE requests SET status = 'rejected', reject_reason = ? WHERE id = ?"
+                )->execute([$reason, $reqId]);
+
+                if ($reqRow) {
+                    sendRejectNotification($reqRow['user_email'], $reqRow['user_name'], $reason);
+                }
+
+                $message = 'Request #' . $reqId . ' rejected.';
+            }
+
+        // ── Soft delete request ──────────────────────────────────────
+        } elseif ($action === 'delete_request') {
+            $reqId = (int)($_POST['request_id'] ?? 0);
+            if ($reqId) {
+                $pdo->prepare(
+                    "UPDATE requests SET status = 'deleted' WHERE id = ?"
+                )->execute([$reqId]);
+                $message = 'Request #' . $reqId . ' deleted.';
+            }
+
+        // ── Soft delete podcast ──────────────────────────────────────
+        } elseif ($action === 'delete_podcast') {
+            $podId = (int)($_POST['podcast_id'] ?? 0);
+            if ($podId) {
+                $pdo->prepare(
+                    "UPDATE podcasts SET deleted = 1 WHERE id = ?"
+                )->execute([$podId]);
+                $message = 'Podcast deleted.';
+            }
+
+        // ── Edit podcast ─────────────────────────────────────────────
+        } elseif ($action === 'edit_podcast') {
+            $podId    = (int)($_POST['podcast_id']   ?? 0);
+            $title    = trim($_POST['title']         ?? '');
+            $desc     = trim($_POST['description']   ?? '');
+            $mp3path  = trim($_POST['mp3_path']      ?? '');
+            $duration = (int)($_POST['duration']     ?? 0);
+
+            if (!$podId || empty($title) || empty($mp3path)) {
+                $message = 'Podcast ID, title and MP3 path are required.';
+                $msgType = 'error';
+            } else {
+                $pdo->prepare(
+                    "UPDATE podcasts SET title = ?, description = ?, mp3_path = ?, duration = ? WHERE id = ?"
+                )->execute([$title, $desc, $mp3path, $duration, $podId]);
+                $message = 'Podcast updated.';
+            }
         }
     }
 }
 
 // Fetch all requests newest first
 $requests = $pdo->query(
-    "SELECT r.*, u.name AS user_name, u.email AS user_email, p.title AS podcast_title
+    "SELECT r.*, u.name AS user_name, u.email AS user_email, p.title AS podcast_title, p.slug AS podcast_slug
      FROM requests r
      JOIN  users u    ON u.id = r.user_id
      LEFT JOIN podcasts p ON p.id = r.podcast_id
+     WHERE r.status != 'deleted'
      ORDER BY r.created_at DESC"
 )->fetchAll();
 
 // Fetch all podcasts for dropdown and list
 $podcasts = $pdo->query(
-    "SELECT * FROM podcasts ORDER BY created_at DESC"
+    "SELECT * FROM podcasts WHERE deleted = 0 ORDER BY created_at DESC"
 )->fetchAll();
 
 $csrf = generateCsrfToken();
@@ -227,7 +294,7 @@ $done    = count(array_filter($requests, fn($r) => $r['status'] === 'done'));
                             <input type="hidden" name="request_id"  value="<?= $r['id'] ?>">
 
                             <select name="status">
-                                <?php foreach (['pending', 'processing', 'done'] as $s): ?>
+                                <?php foreach (['pending', 'processing', 'done', 'rejected', 'deleted'] as $s): ?>
                                     <option value="<?= $s ?>" <?= $r['status'] === $s ? 'selected' : '' ?>>
                                         <?= $s ?>
                                     </option>

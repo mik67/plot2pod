@@ -29,13 +29,13 @@ function sendNewRequestNotification(array $request, string $userName): void {
     sendMail(ADMIN_EMAIL, $subject, $body);
 }
 
-function sendDoneNotification(string $userEmail, string $userName, int $podcastId): void {
+function sendDoneNotification(string $userEmail, string $userName, string $podcastSlug): void {
     $subject = '[plot2pod] Your podcast is ready!';
     $body    = sprintf(
-        "Hi %s,\n\nGreat news — your podcast is ready to listen!\n\n%s/podcast.php?id=%d\n\nEnjoy,\nThe plot2pod team",
+        "Hi %s,\n\nGreat news — your podcast is ready to listen!\n\n%s/podcast/%s\n\nEnjoy,\nThe plot2pod team",
         $userName,
-        SITE_URL,
-        $podcastId
+        rtrim(SITE_URL, '/'),
+        $podcastSlug
     );
 
     sendMail($userEmail, $subject, $body);

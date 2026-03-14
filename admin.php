@@ -62,7 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     )->fetch();
 
                     if ($req && empty($req['notified_at'])) {
-                        sendDoneNotification($req['user_email'], $req['user_name'], $podcastId);
+                        $pod = $pdo->prepare("SELECT slug FROM podcasts WHERE id = ?");
+                        $pod->execute([$podcastId]);
+                        $podSlug = $pod->fetchColumn();
+                        if ($podSlug) {
+                            sendDoneNotification($req['user_email'], $req['user_name'], $podSlug);
+                        }
                         $pdo->prepare("UPDATE requests SET notified_at = NOW() WHERE id = ?")
                             ->execute([$reqId]);
                     }

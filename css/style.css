@@ -215,7 +215,7 @@ button[type="submit"]:not(.btn-primary):not(.btn-small):hover {
 }
 
 /* ── Misc ────────────────────────────────────────────────────── */
-.text-muted { color: var(--text-muted); }
+.text-muted { color: var(--text-muted); font-size: 0.8rem; }
 
 .empty-state {
   text-align: center;
@@ -1088,6 +1088,40 @@ main.admin h1 { margin-bottom: 1.75rem; }
 .admin-request-form button {
   flex-shrink: 0;
   padding: 0.45rem 1rem;
+}
+
+.btn-danger {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+.btn-danger:hover { background: #dc2626; border-color: #dc2626; }
+
+.edit-form { margin-top: 1rem; }
+.hidden    { display: none !important; }
+
+.admin-podcast-info  { flex: 1; }
+.admin-podcast-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+
+.admin-reject-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+.admin-reject-form input[type="text"] {
+  flex: 1;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.reject-reason {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--red);
+  font-size: 0.85rem;
 }
 
 /* ═══════════════════════════════════════════════════════════════

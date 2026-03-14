@@ -29,6 +29,7 @@ $ogImage   = isset($metaOgImage) ? htmlspecialchars($metaOgImage) : htmlspecialc
     <meta property="og:description" content="<?= $desc ?>">
     <meta property="og:url"         content="<?= $canonical ?>">
     <meta property="og:image"       content="<?= $ogImage ?>">
+    <meta property="og:locale" content="en_US">
 
     <!-- Twitter Card -->
     <meta name="twitter:card"        content="summary_large_image">

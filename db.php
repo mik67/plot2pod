@@ -22,12 +22,19 @@ function slugify(string $title): string {
  */
 function generateUniqueSlug(PDO $pdo, string $title): string {
     $base = slugify($title);
+    if ($base === '') {
+        $base = 'podcast-' . time();
+    }
     $slug = $base;
     $i    = 2;
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM podcasts WHERE slug = ?");
     while (true) {
         $stmt->execute([$slug]);
         if ((int)$stmt->fetchColumn() === 0) {
+            break;
+        }
+        if ($i > 9999) {
+            $slug = $base . '-' . time();
             break;
         }
         $slug = $base . '-' . $i++;

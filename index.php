@@ -15,6 +15,24 @@ $podcasts = $pdo->query(
     <title>plot2pod – AI-generated podcasts on any topic</title>
     <?php include __DIR__ . '/partials/meta.php'; ?>
     <link rel="stylesheet" href="/css/style.css">
+    <?php if (!empty($podcasts)): ?>
+    <script type="application/ld+json">
+    <?= json_encode([
+        '@context' => 'https://schema.org',
+        '@type'    => 'ItemList',
+        'name'     => 'Latest podcasts',
+        'url'      => rtrim(SITE_URL, '/') . '/',
+        'itemListElement' => array_map(function($p, $i) {
+            return [
+                '@type'    => 'ListItem',
+                'position' => $i + 1,
+                'name'     => $p['title'],
+                'url'      => rtrim(SITE_URL, '/') . '/podcast.php?id=' . (int)$p['id'],
+            ];
+        }, $podcasts, array_keys($podcasts)),
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
+    </script>
+    <?php endif; ?>
 </head>
 <body class="home">
 <?php include __DIR__ . '/partials/header.php'; ?>

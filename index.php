@@ -66,7 +66,6 @@ $podcasts = $pdo->query(
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
-    </div>
 </div>
 
 <?php include __DIR__ . '/partials/footer.php'; ?>

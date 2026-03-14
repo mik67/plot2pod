@@ -30,7 +30,7 @@ if (!$podcast) {
     <?php
     $metaTitle     = $podcast['title'];
     $metaDesc      = $podcast['description'];
-    $metaCanonical = SITE_URL . '/podcast.php?id=' . $podcast['id'];
+    $metaCanonical = rtrim(SITE_URL, '/') . '/podcast.php?id=' . $podcast['id'];
     include __DIR__ . '/partials/meta.php';
     ?>
     <link rel="stylesheet" href="/css/style.css">
@@ -40,10 +40,10 @@ if (!$podcast) {
         '@type'           => 'PodcastEpisode',
         'name'            => $podcast['title'],
         'description'     => $podcast['description'],
-        'url'             => SITE_URL . '/podcast.php?id=' . $podcast['id'],
+        'url'             => rtrim(SITE_URL, '/') . '/podcast.php?id=' . $podcast['id'],
         'associatedMedia' => [
             '@type'      => 'MediaObject',
-            'contentUrl' => (str_starts_with($podcast['mp3_path'], 'http') ? '' : SITE_URL) . $podcast['mp3_path'],
+            'contentUrl' => (str_starts_with($podcast['mp3_path'], 'http') ? '' : rtrim(SITE_URL, '/')) . $podcast['mp3_path'],
             'encodingFormat' => 'audio/mpeg',
             'duration'   => 'PT' . gmdate('H\Hi\Ms\S', $podcast['duration']),
         ],
@@ -70,7 +70,7 @@ if (!$podcast) {
                 '@type'    => 'ListItem',
                 'position' => 2,
                 'name'     => $podcast['title'],
-                'item'     => SITE_URL . '/podcast.php?id=' . (int)$podcast['id'],
+                'item'     => rtrim(SITE_URL, '/') . '/podcast.php?id=' . (int)$podcast['id'],
             ],
         ],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>

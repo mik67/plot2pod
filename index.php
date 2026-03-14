@@ -27,7 +27,7 @@ $podcasts = $pdo->query(
                 '@type'    => 'ListItem',
                 'position' => $i + 1,
                 'name'     => $p['title'],
-                'url'      => rtrim(SITE_URL, '/') . '/podcast.php?id=' . (int)$p['id'],
+                'url'      => rtrim(SITE_URL, '/') . '/podcast/' . $p['slug'],
             ];
         }, $podcasts, array_keys($podcasts)),
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>

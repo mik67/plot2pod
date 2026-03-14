@@ -14,7 +14,7 @@ $podcasts = $pdo->query(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>plot2pod – AI-generated podcasts on any topic</title>
     <?php include __DIR__ . '/partials/meta.php'; ?>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=<?= filemtime(__DIR__ . '/css/style.css') ?>">
     <?php if (!empty($podcasts)): ?>
     <script type="application/ld+json">
     <?= json_encode([
@@ -54,8 +54,10 @@ $podcasts = $pdo->query(
 </section>
 
 <div class="podcasts-section">
-    <h2>Dive in — free podcasts</h2>
-    <p class="section-sub">on science, politics, tech, and beyond</p>
+    <div class="section-heading">
+        <h2>Dive in — free podcasts</h2>
+        <p class="section-sub">on science, politics, tech, and beyond</p>
+    </div>
         <?php if (empty($podcasts)): ?>
             <div class="empty-state">
                 <p>Podcasts coming soon — be the first to <a href="/register.php">submit a topic</a>!</p>

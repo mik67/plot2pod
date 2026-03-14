@@ -489,19 +489,23 @@ body.home main { padding: 0; }
   margin: 0 auto;
 }
 
-.podcasts-section h2 {
-  margin: 0 !important;
-  padding: 0;
-  line-height: 1;
-  text-align: center;
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  margin-bottom: 1.75rem;
 }
-.podcasts-section .section-sub {
-  text-align: center;
+.section-heading h2 {
+  margin: 0;
+  line-height: 1.1;
+}
+.section-heading .section-sub {
   font-size: 0.95rem;
   color: var(--text-muted);
-  margin: -0.5rem 0 1.75rem !important;
-  padding: 0;
+  margin: 0;
   line-height: 1.4;
+  text-align: center;
 }
 .podcasts-section h2 small {
   font-family: 'Figtree', sans-serif;

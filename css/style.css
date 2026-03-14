@@ -491,9 +491,7 @@ body.home main { padding: 0; }
 
 .podcasts-section h2 {
   margin-bottom: 1.75rem;
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  text-align: center;
 }
 .podcasts-section h2 small {
   font-family: 'Figtree', sans-serif;

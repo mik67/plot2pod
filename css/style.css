@@ -490,14 +490,15 @@ body.home main { padding: 0; }
 }
 
 .podcasts-section h2 {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0;
+  line-height: 1;
   text-align: center;
 }
 .podcasts-section .section-sub {
   text-align: center;
   font-size: 0.95rem;
   color: var(--text-muted);
-  margin-top: 0;
+  margin-top: 0.35rem;
   margin-bottom: 1.75rem;
 }
 .podcasts-section h2 small {

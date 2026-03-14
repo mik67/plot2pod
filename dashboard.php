@@ -7,7 +7,7 @@ requireAuth();
 $user = currentUser();
 
 $stmt = $pdo->prepare(
-    "SELECT r.*, p.title AS podcast_title
+    "SELECT r.*, p.title AS podcast_title, p.slug AS podcast_slug
      FROM requests r
      LEFT JOIN podcasts p ON p.id = r.podcast_id
      WHERE r.user_id = ?
@@ -67,7 +67,7 @@ $submitted = !empty($_GET['submitted']);
                     </div>
                     <?php if ($r['podcast_id']): ?>
                     <div class="request-row-podcast">
-                        🎙 <a href="/podcast.php?id=<?= $r['podcast_id'] ?>">
+                        🎙 <a href="/podcast/<?= htmlspecialchars($r['podcast_slug']) ?>">
                             <?= htmlspecialchars($r['podcast_title']) ?>
                         </a>
                     </div>

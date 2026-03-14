@@ -492,14 +492,11 @@ body.home main { padding: 0; }
 .podcasts-section h2 {
   margin-bottom: 1.75rem;
   text-align: center;
+  font-weight: 500;
 }
 .podcasts-section h2 .h2-lead {
-  display: block;
   font-size: 1.2em;
   font-weight: 800;
-}
-.podcasts-section h2 .h2-sub {
-  display: block;
 }
 .podcasts-section h2 small {
   font-family: 'Figtree', sans-serif;

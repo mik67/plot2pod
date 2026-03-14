@@ -7,11 +7,11 @@ $slug = trim($_GET['slug'] ?? '');
 $id   = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
 if ($slug !== '') {
-    $stmt = $pdo->prepare("SELECT * FROM podcasts WHERE slug = ? AND published = 1");
+    $stmt = $pdo->prepare("SELECT * FROM podcasts WHERE slug = ? AND published = 1 AND deleted = 0");
     $stmt->execute([$slug]);
     $podcast = $stmt->fetch();
 } elseif ($id) {
-    $stmt = $pdo->prepare("SELECT * FROM podcasts WHERE id = ? AND published = 1");
+    $stmt = $pdo->prepare("SELECT * FROM podcasts WHERE id = ? AND published = 1 AND deleted = 0");
     $stmt->execute([$id]);
     $podcast = $stmt->fetch();
 } else {

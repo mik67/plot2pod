@@ -5,7 +5,7 @@ require_once __DIR__ . '/db.php';
 header('Content-Type: application/xml; charset=utf-8');
 
 $podcasts = $pdo->query(
-    "SELECT id, slug, created_at FROM podcasts WHERE published = 1 ORDER BY created_at DESC"
+    "SELECT id, slug, created_at FROM podcasts WHERE published = 1 AND deleted = 0 ORDER BY created_at DESC"
 )->fetchAll();
 
 $base = rtrim(SITE_URL, '/');

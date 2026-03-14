@@ -4,7 +4,7 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 
 $podcasts = $pdo->query(
-    "SELECT * FROM podcasts WHERE published = 1 ORDER BY created_at DESC"
+    "SELECT * FROM podcasts WHERE published = 1 AND deleted = 0 ORDER BY created_at DESC"
 )->fetchAll();
 ?>
 <!DOCTYPE html>

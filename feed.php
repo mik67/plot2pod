@@ -7,7 +7,7 @@ header('Content-Type: application/rss+xml; charset=utf-8');
 try {
     $podcasts = $pdo->query(
         "SELECT id, slug, title, description, mp3_path, duration, created_at
-         FROM podcasts WHERE published = 1 ORDER BY created_at DESC"
+         FROM podcasts WHERE published = 1 AND deleted = 0 ORDER BY created_at DESC"
     )->fetchAll();
 } catch (Exception $e) {
     $podcasts = [];

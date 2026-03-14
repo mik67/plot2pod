@@ -40,3 +40,15 @@ function sendDoneNotification(string $userEmail, string $userName, string $podca
 
     sendMail($userEmail, $subject, $body);
 }
+
+function sendRejectNotification(string $userEmail, string $userName, string $reason): void {
+    $subject = '[plot2pod] Your podcast request was not accepted';
+    $body    = sprintf(
+        "Hi %s,\n\nUnfortunately your podcast request was not accepted.\n\nReason: %s\n\nFeel free to submit a new request at %s\n\nThe plot2pod team",
+        $userName,
+        $reason,
+        rtrim(SITE_URL, '/')
+    );
+
+    sendMail($userEmail, $subject, $body);
+}
